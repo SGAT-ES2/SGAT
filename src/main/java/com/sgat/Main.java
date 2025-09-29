@@ -20,7 +20,7 @@ public class Main extends Application {
         Scene scene = new Scene(root, 300, 150);
 
         // 4. Define o título da janela e mostra na tela
-        primaryStage.setTitle("Funcionou");
+        primaryStage.setTitle("Funcionou burro!!!");
         primaryStage.setScene(scene);
         primaryStage.show();
     }
