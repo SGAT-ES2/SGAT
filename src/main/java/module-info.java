@@ -7,6 +7,6 @@ module com.sgat {
     requires java.sql;
 
     // Abre nosso pacote para a biblioteca do JavaFX, permitindo que ela acesse nosso código
-    opens com.sgat to javafx.fxml;
+    opens com.sgat.controller to javafx.fxml;
     exports com.sgat;
 }
