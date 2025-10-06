@@ -4,6 +4,13 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.stage.Stage;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+
+import java.io.IOException;
+
 
 public class LoginController {
 
@@ -35,5 +42,15 @@ public class LoginController {
             statusLabel.setText("Usuário ou senha inválidos.");
             statusLabel.setStyle("-fx-text-fill: red;");
         }
+    }
+
+    @FXML
+    private void handleRegisterClick() throws IOException, IOException {
+        Parent root = FXMLLoader.load(getClass().getResource("/com/sgat/views/CadastroView.fxml"));
+        Stage stage = (Stage) usernameField.getScene().getWindow();
+        Scene scene = new Scene(root);
+        stage.setScene(scene);
+        stage.setTitle("Cadastro de Novo Funcionário");
+        stage.show();
     }
 }

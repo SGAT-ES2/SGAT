@@ -15,7 +15,7 @@
             <TextField fx:id="usernameField" promptText="Usuário" />
             <PasswordField fx:id="passwordField" promptText="Senha" />
             <Button onAction="#handleLogin" text="Login" />
-<!--             <Button onAction="#handleRegistert="Registrar" />-->
+             <Button onAction="#handleRegisterClick" text="Registrar" />
             <Label fx:id="statusLabel" />
          </children>
          <padding>
