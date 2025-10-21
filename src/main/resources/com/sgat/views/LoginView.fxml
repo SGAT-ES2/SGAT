@@ -7,20 +7,20 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox alignment="CENTER" spacing="10.0" styleClass="root" stylesheets="@LoginStyles.css" xmlns="http://javafx.com/javafx/11" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.sgat.controller.LoginController">
-   <children>
-      <VBox alignment="CENTER" spacing="15.0" styleClass="login-container">
-         <children>
-            <Label styleClass="title" text="Bem-Vindo" />
-            <TextField fx:id="usernameField" promptText="Usuário" />
-            <PasswordField fx:id="passwordField" promptText="Senha" />
-            <Button onAction="#handleLogin" text="Login" />
-             <Button onAction="#handleRegisterClick" text="Registrar" />
-            <Label fx:id="statusLabel" />
-         </children>
-         <padding>
-            <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
-         </padding>
-      </VBox>
-   </children>
-</VBox>
+<StackPane styleClass="root"
+           xmlns="http://javafx.com/javafx/11"
+           xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="com.sgat.controller.LoginController">
+    <children>
+        <VBox alignment="CENTER" spacing="15.0" styleClass="login-card">
+            <children>
+                <Label styleClass="title" text="Bem-Vindo" />
+                <TextField fx:id="usernameField" promptText="Usuário" />
+                <PasswordField fx:id="passwordField" promptText="Senha" />
+                <Button onAction="#handleLogin" text="Login" />
+                <Button onAction="#handleRegisterClick" text="Registrar" />
+                <Label fx:id="statusLabel" />
+            </children>
+        </VBox>
+    </children>
+</StackPane>

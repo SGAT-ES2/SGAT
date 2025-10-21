@@ -1,22 +1,27 @@
 package com.sgat;
 
+import com.sgat.view.MainLayout;
 import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-import java.io.IOException;
 import java.util.Objects;
 
 public class Main extends Application {
 
     @Override
-    public void start(Stage primaryStage) throws IOException {
-        Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("/com/sgat/views/LoginView.fxml")));
-        Scene scene = new Scene(root, 350, 250);
-        primaryStage.setTitle("SGAT - Login");
+    public void start(Stage primaryStage) {
+        primaryStage.setTitle("TravelManager");
+
+        // Cria o layout principal
+        MainLayout mainLayout = new MainLayout();
+
+        // --- Scene and Stage ---
+        Scene scene = new Scene(mainLayout.getLayout(), 1280.0, 720.0);
+        scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/com/sgat/views/MainStyles.css")).toExternalForm());
+
         primaryStage.setScene(scene);
+        primaryStage.setMaximized(true); // Maximiza a janela
         primaryStage.show();
     }
 
