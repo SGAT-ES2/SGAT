@@ -107,6 +107,7 @@ public class ReservationsView {
 
         TableColumn<Reservation, LocalDate> dateCol = new TableColumn<>("Data da Viagem");
         dateCol.setCellValueFactory(cellData -> cellData.getValue().travelDateProperty());
+        dateCol.setCellFactory(col -> new DateCell());
         dateCol.setPrefWidth(150);
 
         TableColumn<Reservation, Integer> passengersCol = new TableColumn<>("Passageiros");
@@ -115,44 +116,21 @@ public class ReservationsView {
 
         TableColumn<Reservation, Double> valueCol = new TableColumn<>("Valor Total");
         valueCol.setCellValueFactory(cellData -> cellData.getValue().totalValueProperty().asObject());
+        valueCol.setCellFactory(col -> new ValueCell());
         valueCol.setPrefWidth(150);
 
         TableColumn<Reservation, String> statusCol = new TableColumn<>("Status");
         statusCol.setCellValueFactory(cellData -> cellData.getValue().statusProperty());
+        statusCol.setCellFactory(col -> new StatusCell());
         statusCol.setPrefWidth(100);
 
-        TableColumn<Reservation, Void> actionsCol = new TableColumn<>("Ações");
-        actionsCol.setCellFactory(col -> new ActionsCell());
-        actionsCol.setMinWidth(100);
-        actionsCol.setMaxWidth(100);
-
-        tableView.getColumns().addAll(clientCol, packageCol, dateCol, passengersCol, valueCol, statusCol, actionsCol);
+        tableView.getColumns().addAll(clientCol, packageCol, dateCol, passengersCol, valueCol, statusCol);
         return tableView;
     }
 
     private void handleAddReservation() {
         // Placeholder for adding a new reservation
         showAlert(Alert.AlertType.INFORMATION, "Funcionalidade não implementada", "A adição de novas reservas ainda não foi implementada.");
-    }
-
-    private void handleEditReservation(Reservation reservation) {
-        // Placeholder for editing a reservation
-        showAlert(Alert.AlertType.INFORMATION, "Funcionalidade não implementada", "A edição de reservas ainda não foi implementada.");
-    }
-
-    private void handleDeleteReservation(Reservation reservation) {
-        // Placeholder for deleting a reservation
-        Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION);
-        confirmation.setTitle("Confirmar Exclusão");
-        confirmation.setHeaderText("Excluir Reserva");
-        confirmation.setContentText("Você tem certeza que deseja remover esta reserva?");
-
-        confirmation.showAndWait().ifPresent(response -> {
-            if (response == ButtonType.OK) {
-                reservations.remove(reservation);
-                showAlert(Alert.AlertType.INFORMATION, "Reserva Removida", "A reserva foi removida com sucesso.");
-            }
-        });
     }
 
     private void showAlert(Alert.AlertType type, String title, String message) {
@@ -163,46 +141,48 @@ public class ReservationsView {
         alert.showAndWait();
     }
 
-    private class ActionsCell extends TableCell<Reservation, Void> {
-        private final HBox box;
-        private final Button editButton = new Button();
-        private final Button deleteButton = new Button();
+    private class StatusCell extends TableCell<Reservation, String> {
+        private final Label statusLabel;
 
-        public ActionsCell() {
-            box = new HBox(8);
-            box.setAlignment(Pos.CENTER);
-
-            editButton.getStyleClass().addAll("icon-button");
-            SVGPath editIcon = new SVGPath();
-            editIcon.setContent("M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z");
-            editButton.setGraphic(editIcon);
-
-            deleteButton.getStyleClass().addAll("icon-button", "delete-button");
-            SVGPath deleteIcon = new SVGPath();
-            deleteIcon.setContent("M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2");
-            deleteButton.setGraphic(deleteIcon);
-
-            box.getChildren().addAll(editButton, deleteButton);
-            setGraphic(box);
-
-            editButton.setOnAction(e -> {
-                Reservation reservation = getTableView().getItems().get(getIndex());
-                handleEditReservation(reservation);
-            });
-
-            deleteButton.setOnAction(e -> {
-                Reservation reservation = getTableView().getItems().get(getIndex());
-                handleDeleteReservation(reservation);
-            });
+        public StatusCell() {
+            statusLabel = new Label();
+            setGraphic(statusLabel);
+            setAlignment(Pos.CENTER_LEFT);
         }
 
         @Override
-        protected void updateItem(Void item, boolean empty) {
-            super.updateItem(item, empty);
-            if (empty) {
+        protected void updateItem(String status, boolean empty) {
+            super.updateItem(status, empty);
+            if (empty || status == null) {
                 setGraphic(null);
             } else {
-                setGraphic(box);
+                statusLabel.setText(status);
+                statusLabel.getStyleClass().setAll("status-label", status.equalsIgnoreCase("Confirmada") ? "status-confirmada" : "status-pendente");
+                setGraphic(statusLabel);
+            }
+        }
+    }
+
+    private class ValueCell extends TableCell<Reservation, Double> {
+        @Override
+        protected void updateItem(Double item, boolean empty) {
+            super.updateItem(item, empty);
+            if (empty || item == null) {
+                setText(null);
+            } else {
+                setText(String.format("R$ %.2f", item));
+            }
+        }
+    }
+
+    private class DateCell extends TableCell<Reservation, LocalDate> {
+        @Override
+        protected void updateItem(LocalDate item, boolean empty) {
+            super.updateItem(item, empty);
+            if (empty || item == null) {
+                setText(null);
+            } else {
+                setText(item.format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy")));
             }
         }
     }
