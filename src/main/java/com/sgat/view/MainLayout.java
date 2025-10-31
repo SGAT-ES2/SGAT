@@ -35,6 +35,7 @@ public class MainLayout {
         views.put("Dashboard", new DashboardView().getView());
         views.put("Pacotes", new PackagesView().getView());
         views.put("Clientes", new ClientsView().getView());
+        views.put("Reservas", new ReservationsView().getView());
 
         contentStack.getChildren().addAll(views.values());
 
@@ -109,7 +110,7 @@ public class MainLayout {
             createNavButton("Dashboard", "M3 3v18h18V3H3zm16 16H5V5h14v14zM11 7h2v2h-2zm0 4h2v6h-2z"),
             createNavButton("Pacotes", "M21.2,8.4l-1.8-1.8L12,14,4.6,6.6,2.8,8.4,12,17.6Z"),
             createNavButton("Clientes", "M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"),
-            createNavButton("Reserva", "M8 22h8M12 16.5A2.5 2.5 0 0 1 9.5 14h5a2.5 2.5 0 0 1-2.5 2.5Z"),
+            createNavButton("Reservas", "M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zM5 8V6h14v2H5z"),
             createNavButton("Pagamentos", "M22 10a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-8zm-2 0H4v-2h16v2z"),
             createNavButton("Itinerários", "M14.5 2.5a2.5 2.5 0 0 0-5 0V5h5V2.5zM11 14h-1v5h1v-5zm4 0h-1v5h1v-5zM12 7a1 1 0 0 1 1 1v2h-2V8a1 1 0 0 1 1-1zM5 22V9a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v13H5z"),
             createNavButton("Relatórios", "M16 6h3v12h-3zM2 12h7v6H2zm9-10h3v18h-3z")
