@@ -14,10 +14,16 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.shape.SVGPath;
 import javafx.util.Duration;
-
+import org.kordamp.ikonli.javafx.FontIcon;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.kordamp.ikonli.materialdesign2.MaterialDesignA; // Para MDI_ACCOUNT_MULTIPLE
+import org.kordamp.ikonli.materialdesign2.MaterialDesignC; // Para MDI_CALENDAR, MDI_CREDIT_CARD, MDI_CHART_BAR
+import org.kordamp.ikonli.materialdesign2.MaterialDesignL; // Para MDI_LOGOUT
+import org.kordamp.ikonli.materialdesign2.MaterialDesignM; // Para MDI_MAP_MARKER
+import org.kordamp.ikonli.materialdesign2.MaterialDesignP; // Para MDI_PACKAGE_VARIANT_CLOSED
+import org.kordamp.ikonli.materialdesign2.MaterialDesignV; // Para MDI_VIEW_DASHBOARD
 public class MainLayout {
 
     private final BorderPane mainLayout;
@@ -26,6 +32,7 @@ public class MainLayout {
     private final StackPane contentStack;
     private final Map<String, Node> views = new HashMap<>();
     private final ToggleGroup toggleGroup = new ToggleGroup();
+    private final int ICON_SIZE = 20;
 
     public MainLayout() {
         mainLayout = new BorderPane();
@@ -106,14 +113,29 @@ public class MainLayout {
         menuHeader.managedProperty().bind(sidebarCollapsed.not());
 
         VBox buttons = new VBox(4);
+        FontIcon dashboardIcon, calendarIcon, packageIcon, clientIcon, payIcon,itineraryIcon, chartIcon;
+        dashboardIcon = new FontIcon(MaterialDesignV.VIEW_DASHBOARD);
+        dashboardIcon.setIconSize(ICON_SIZE);
+        packageIcon = new FontIcon(MaterialDesignP.PACKAGE_VARIANT_CLOSED);
+        packageIcon.setIconSize(ICON_SIZE);
+        clientIcon = new FontIcon(MaterialDesignA.ACCOUNT_MULTIPLE);
+        clientIcon.setIconSize(ICON_SIZE);
+        calendarIcon = new FontIcon(MaterialDesignC.CALENDAR);
+        calendarIcon.setIconSize(ICON_SIZE);
+        payIcon = new FontIcon(MaterialDesignC.CREDIT_CARD);
+        payIcon.setIconSize(ICON_SIZE);
+        itineraryIcon = new FontIcon(MaterialDesignM.MAP_MARKER);
+        itineraryIcon.setIconSize(ICON_SIZE);
+        chartIcon = new FontIcon(MaterialDesignC.CHART_BAR);
+        chartIcon.setIconSize(ICON_SIZE);
         buttons.getChildren().addAll(
-            createNavButton("Dashboard", "M3 3v18h18V3H3zm16 16H5V5h14v14zM11 7h2v2h-2zm0 4h2v6h-2z"),
-            createNavButton("Pacotes", "M21.2,8.4l-1.8-1.8L12,14,4.6,6.6,2.8,8.4,12,17.6Z"),
-            createNavButton("Clientes", "M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"),
-            createNavButton("Reservas", "M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zM5 8V6h14v2H5z"),
-            createNavButton("Pagamentos", "M22 10a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-8zm-2 0H4v-2h16v2z"),
-            createNavButton("Itinerários", "M14.5 2.5a2.5 2.5 0 0 0-5 0V5h5V2.5zM11 14h-1v5h1v-5zm4 0h-1v5h1v-5zM12 7a1 1 0 0 1 1 1v2h-2V8a1 1 0 0 1 1-1zM5 22V9a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v13H5z"),
-            createNavButton("Relatórios", "M16 6h3v12h-3zM2 12h7v6H2zm9-10h3v18h-3z")
+                createNavButton("Dashboard", dashboardIcon),
+                createNavButton("Pacotes", packageIcon),
+                createNavButton("Clientes", clientIcon),
+                createNavButton("Reservas", calendarIcon),
+                createNavButton("Pagamentos", payIcon),
+                createNavButton("Itinerários", itineraryIcon),
+                createNavButton("Relatórios", chartIcon)
         );
 
         navigation.getChildren().addAll(menuHeader, buttons);
@@ -146,6 +168,32 @@ public class MainLayout {
         return button;
     }
 
+    private ToggleButton createNavButton(String text, Node iconNode) {
+        ToggleButton button = new ToggleButton();
+        button.setToggleGroup(toggleGroup);
+        button.getStyleClass().add("sidebar-menu-button");
+        button.setUserData(text);
+
+        // Adicionamos a mesma classe de estilo ao FontIcon
+        // para que ele herde o tamanho e a cor do seu CSS!
+        iconNode.getStyleClass().add("icon-svg");
+
+        Label label = new Label(text);
+        label.visibleProperty().bind(sidebarCollapsed.not());
+        label.managedProperty().bind(sidebarCollapsed.not());
+
+        HBox content = new HBox(12, iconNode, label); // Usa o iconNode diretamente
+        content.setAlignment(Pos.CENTER_LEFT);
+        button.setGraphic(content);
+        button.setAlignment(Pos.CENTER_LEFT);
+
+        if (text.equals("Dashboard")) {
+            button.setSelected(true);
+        }
+
+        return button;
+    }
+
     private Node createSidebarFooter() {
         VBox footer = new VBox();
         footer.setAlignment(Pos.BOTTOM_CENTER);
@@ -154,8 +202,8 @@ public class MainLayout {
         logoutButton.getStyleClass().add("sidebar-logout-button");
         logoutButton.setMaxWidth(Double.MAX_VALUE);
 
-        SVGPath icon = new SVGPath();
-        icon.setContent("M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4");
+        FontIcon icon = new FontIcon(MaterialDesignL.LOGOUT);
+        icon.setIconSize(ICON_SIZE);
         icon.getStyleClass().add("icon-svg");
         Label label = new Label("Sair");
         label.visibleProperty().bind(sidebarCollapsed.not());
@@ -205,7 +253,6 @@ public class MainLayout {
             timeline.setOnFinished(event -> sidebarCollapsed.set(!collapsed));
             timeline.play();
         });
-
         header.getChildren().add(sidebarTrigger);
         return header;
     }

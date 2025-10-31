@@ -16,10 +16,18 @@ import javafx.scene.shape.SVGPath;
 import java.time.LocalDate;
 import java.util.Optional;
 
+
+import org.kordamp.ikonli.javafx.FontIcon;
+import org.kordamp.ikonli.materialdesign2.MaterialDesignA; // Para MDI_ACCOUNT_MULTIPLE
+import org.kordamp.ikonli.materialdesign2.MaterialDesignC; // Para MDI_CALENDAR, MDI_CREDIT_CARD
+import org.kordamp.ikonli.materialdesign2.MaterialDesignP; // Para MDI_PACKAGE_VARIANT_CLOSED
+
+
 public class ReservationsView {
     private final VBox view;
     private TableView<Reservation> table;
     private final ObservableList<Reservation> reservations = FXCollections.observableArrayList();
+    private final int CELL_ICON_SIZE = 18;
 
     public ReservationsView() {
         view = new VBox(24);
@@ -97,12 +105,14 @@ public class ReservationsView {
         TableView<Reservation> tableView = new TableView<>(reservations);
         tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
 
-        TableColumn<Reservation, String> clientCol = new TableColumn<>("Cliente");
-        clientCol.setCellValueFactory(cellData -> cellData.getValue().getClient().nameProperty());
+        TableColumn<Reservation, Client> clientCol = new TableColumn<>("Cliente");
+        clientCol.setCellValueFactory(cellData -> cellData.getValue().clientProperty());
+        clientCol.setCellFactory(col -> new ClientCell());
         clientCol.setPrefWidth(200);
 
-        TableColumn<Reservation, String> packageCol = new TableColumn<>("Pacote");
-        packageCol.setCellValueFactory(cellData -> cellData.getValue().getTravelPackage().nameProperty());
+        TableColumn<Reservation, Package> packageCol = new TableColumn<>("Pacote");
+        packageCol.setCellValueFactory(cellData -> cellData.getValue().travelPackageProperty());
+        packageCol.setCellFactory(col -> new PackageCell());
         packageCol.setPrefWidth(250);
 
         TableColumn<Reservation, LocalDate> dateCol = new TableColumn<>("Data da Viagem");
@@ -267,14 +277,86 @@ public class ReservationsView {
         }
     }
 
+    private class ClientCell extends TableCell<Reservation, Client> {
+        private final HBox box;
+        private final FontIcon icon;
+        private final Label label;
+
+        public ClientCell() {
+            box = new HBox(12);
+            box.setAlignment(Pos.CENTER_LEFT);
+            icon = new FontIcon(MaterialDesignA.ACCOUNT);
+            icon.setIconSize(CELL_ICON_SIZE);
+            icon.getStyleClass().add("icon-svg");
+            label = new Label();
+            box.getChildren().addAll(icon, label);
+            setGraphic(box);
+        }
+
+        @Override
+        protected void updateItem(Client item, boolean empty) {
+            super.updateItem(item, empty);
+            if (empty || item == null) {
+                setGraphic(null);
+            } else {
+                label.setText(item.getName());
+                setGraphic(box);
+            }
+        }
+    }
+
+    private class PackageCell extends TableCell<Reservation, Package> {
+        private final HBox box;
+        private final FontIcon icon;
+        private final Label label;
+
+        public PackageCell() {
+            box = new HBox(12);
+            box.setAlignment(Pos.CENTER_LEFT);
+            icon = new FontIcon(MaterialDesignP.PACKAGE_VARIANT_CLOSED);
+            icon.setIconSize(CELL_ICON_SIZE);
+            icon.getStyleClass().add("icon-svg");
+            label = new Label();
+            box.getChildren().addAll(icon, label);
+            setGraphic(box);
+        }
+
+        @Override
+        protected void updateItem(Package item, boolean empty) {
+            super.updateItem(item, empty);
+            if (empty || item == null) {
+                setGraphic(null);
+            } else {
+                label.setText(item.getName());
+                setGraphic(box);
+            }
+        }
+    }
+
     private class DateCell extends TableCell<Reservation, LocalDate> {
+        private final HBox box;
+        private final FontIcon icon;
+        private final Label label;
+
+        public DateCell() {
+            box = new HBox(12);
+            box.setAlignment(Pos.CENTER_LEFT);
+            icon = new FontIcon(MaterialDesignC.CALENDAR);
+            icon.setIconSize(CELL_ICON_SIZE);
+            icon.getStyleClass().add("icon-svg");
+            label = new Label();
+            box.getChildren().addAll(icon, label);
+            setGraphic(box);
+        }
+
         @Override
         protected void updateItem(LocalDate item, boolean empty) {
             super.updateItem(item, empty);
             if (empty || item == null) {
-                setText(null);
+                setGraphic(null);
             } else {
-                setText(item.format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+                label.setText(item.format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+                setGraphic(box);
             }
         }
     }
