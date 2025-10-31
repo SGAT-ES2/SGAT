@@ -441,3 +441,77 @@
     -fx-padding: 4 8;
     -fx-background-radius: 12;
 }
+
+/* ==========================================================================
+   Login View
+   ========================================================================== */
+
+.login-root {
+    -fx-background-color: linear-gradient(to bottom right, #E3F2FD, #FFFFFF, #F1E4FF);
+}
+
+.card {
+    -fx-background-color: white;
+    -fx-padding: 30;
+    -fx-spacing: 15;
+    -fx-background-radius: 15;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 20, 0, 0, 5);
+    -fx-max-width: 400;
+    -fx-alignment: top-center;
+}
+
+.plane-icon-container {
+    -fx-background-color: linear-gradient(to bottom right, #2979FF, #448AFF);
+    -fx-background-radius: 10;
+    -fx-padding: 15;
+    -fx-min-width: 60;
+    -fx-min-height: 60;
+    -fx-alignment: center;
+}
+
+.plane-icon {
+    -fx-fill: white;
+    -fx-scale-x: 1.5;
+    -fx-scale-y: 1.5;
+}
+
+.card-title {
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+}
+
+.card-subtitle {
+    -fx-font-size: 14px;
+    -fx-text-fill: #757575;
+}
+
+.input-field {
+    -fx-font-size: 14px;
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
+    -fx-border-color: #E0E0E0;
+    -fx-background-color: #F8F9FA;
+}
+
+.input-field:focused {
+    -fx-border-color: #2979FF;
+    -fx-background-color: white;
+}
+
+.input-icon {
+    -fx-fill: #9E9E9E;
+}
+
+.login-button {
+    -fx-background-color: linear-gradient(to bottom right, #2979FF, #448AFF);
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8;
+    -fx-padding: 12;
+    -fx-cursor: hand;
+    -fx-font-size: 16px;
+}
+
+.login-button:hover {
+    -fx-effect: dropshadow(gaussian, #2979FF, 10, 0, 0, 0);
+}

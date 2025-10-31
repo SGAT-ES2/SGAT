@@ -1,5 +1,6 @@
 package com.sgat;
 
+import com.sgat.view.LoginView;
 import com.sgat.view.MainLayout;
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -14,14 +15,14 @@ public class Main extends Application {
         primaryStage.setTitle("TravelManager");
 
         // Cria o layout principal
-        MainLayout mainLayout = new MainLayout();
+        LoginView loginView = new LoginView();
 
         // --- Scene and Stage ---
-        Scene scene = new Scene(mainLayout.getLayout(), 1280.0, 720.0);
+        Scene scene = new Scene(loginView.getView());
         scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/com/sgat/views/MainStyles.css")).toExternalForm());
 
         primaryStage.setScene(scene);
-        primaryStage.setMaximized(true); // Maximiza a janela
+        primaryStage.setFullScreen(true);
         primaryStage.show();
     }
 
