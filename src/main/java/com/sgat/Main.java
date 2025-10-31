@@ -1,27 +1,28 @@
 package com.sgat;
 
+import com.sgat.view.LoginView;
+import com.sgat.view.MainLayout;
 import javafx.application.Application;
 import javafx.scene.Scene;
-import javafx.scene.control.Label;
-import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
+
+import java.util.Objects;
 
 public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        // 1. Cria o texto "Funcionou"
-        Label label = new Label("Funcionou");
+        primaryStage.setTitle("TravelManager");
 
-        // 2. Coloca o texto em um painel
-        StackPane root = new StackPane(label);
+        // Cria o layout principal
+        LoginView loginView = new LoginView();
 
-        // 3. Cria a cena (o conteúdo)
-        Scene scene = new Scene(root, 300, 150);
+        // --- Scene and Stage ---
+        Scene scene = new Scene(loginView.getView());
+        scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/com/sgat/views/MainStyles.css")).toExternalForm());
 
-        // 4. Define o título da janela e mostra na tela
-        primaryStage.setTitle("Funcionou burro!!!");
         primaryStage.setScene(scene);
+        primaryStage.setFullScreen(true);
         primaryStage.show();
     }
 
