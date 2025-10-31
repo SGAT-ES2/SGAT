@@ -46,7 +46,6 @@ public class LoginView {
 
         // Login Button
         Button loginButton = new Button("Entrar");
-        loginButton.setMaxWidth(Double.MAX_VALUE);
         loginButton.getStyleClass().add("login-button");
 
         loginButton.setOnAction(e -> {

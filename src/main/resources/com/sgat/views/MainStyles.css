@@ -457,6 +457,7 @@
     -fx-background-radius: 15;
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 20, 0, 0, 5);
     -fx-max-width: 400;
+    -fx-max-height: 500;
     -fx-alignment: top-center;
 }
 
@@ -510,6 +511,8 @@
     -fx-padding: 12;
     -fx-cursor: hand;
     -fx-font-size: 16px;
+    -fx-max-width: 200;
+    -fx-alignment: center;
 }
 
 .login-button:hover {
