@@ -129,8 +129,100 @@ public class ReservationsView {
     }
 
     private void handleAddReservation() {
-        // Placeholder for adding a new reservation
-        showAlert(Alert.AlertType.INFORMATION, "Funcionalidade não implementada", "A adição de novas reservas ainda não foi implementada.");
+        showReservationDialog(null).ifPresent(reservation -> {
+            reservations.add(reservation);
+            showAlert(Alert.AlertType.INFORMATION, "Reserva Adicionada", "Nova reserva cadastrada com sucesso.");
+        });
+    }
+
+    private Optional<Reservation> showReservationDialog(Reservation reservation) {
+        Dialog<Reservation> dialog = new Dialog<>();
+        dialog.setTitle(reservation == null ? "Adicionar Nova Reserva" : "Editar Reserva");
+        dialog.setHeaderText(reservation == null ? "Preencha as informações da nova reserva." : "Atualize as informações da reserva.");
+
+        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+
+        dialog.getDialogPane().setPrefWidth(900);
+
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(20, 20, 10, 10));
+
+        ComboBox<Client> clientComboBox = new ComboBox<>();
+        // Dummy data for clients
+        ObservableList<Client> clients = FXCollections.observableArrayList(
+            new Client("Beatriz Oliveira", "beatriz.oliveira@example.com", "(11) 98765-4321", "123.456.789-00", "Rua das Flores, 123, São Paulo, SP", "Prefere destinos de praia e resorts all-inclusive. Gosta de viajar em família.", 5),
+            new Client("Carlos Pereira", "carlos.pereira@example.com", "(21) 91234-5678", "987.654.321-00", "Avenida Copacabana, 456, Rio de Janeiro, RJ", "Interessado em turismo de aventura, como trilhas e montanhismo. Viagens solo.", 8)
+        );
+        clientComboBox.setItems(clients);
+
+        ComboBox<Package> packageComboBox = new ComboBox<>();
+        // Dummy data for packages
+        ObservableList<Package> packages = FXCollections.observableArrayList(
+            new Package("Férias em Cancún", "Cancún", "Pacote de 7 dias em resort all-inclusive", "7 dias", 2500.00, LocalDate.of(2025, 10, 20), LocalDate.of(2025, 10, 27), "Inclui passagem aérea, hospedagem e passeios."),
+            new Package("Aventura na Patagônia", "Patagônia", "Pacote de 10 dias com trilhas e escaladas", "10 dias", 4500.00, LocalDate.of(2025, 11, 15), LocalDate.of(2025, 11, 25), "Inclui guias, equipamentos e acomodação em refúgios de montanha.")
+        );
+        packageComboBox.setItems(packages);
+
+        DatePicker travelDatePicker = new DatePicker();
+        TextField passengersField = new TextField();
+        TextField valueField = new TextField();
+        HBox valueBox = new HBox(5, new Label("R$"), valueField);
+        valueBox.setAlignment(Pos.CENTER_LEFT);
+        ComboBox<String> statusComboBox = new ComboBox<>();
+        statusComboBox.setItems(FXCollections.observableArrayList("Confirmada", "Pendente", "Cancelada"));
+
+        class StatusCell extends ListCell<String> {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setGraphic(null);
+                } else {
+                    Label statusLabel = new Label(item);
+                    statusLabel.getStyleClass().setAll("status-label", item.equalsIgnoreCase("Confirmada") ? "status-confirmada" : (item.equalsIgnoreCase("Pendente") ? "status-pendente" : "status-cancelada"));
+                    setGraphic(statusLabel);
+                }
+            }
+        }
+
+        statusComboBox.setCellFactory(cell -> new StatusCell());
+        statusComboBox.setButtonCell(new StatusCell());
+        TextArea observationsArea = new TextArea();
+
+        grid.add(new Label("Cliente:"), 0, 0);
+        grid.add(clientComboBox, 1, 0);
+        grid.add(new Label("Pacote:"), 2, 0);
+        grid.add(packageComboBox, 3, 0);
+        grid.add(new Label("Data da Viagem:"), 0, 1);
+        grid.add(travelDatePicker, 1, 1);
+        grid.add(new Label("Número de Passageiros:"), 2, 1);
+        grid.add(passengersField, 3, 1);
+        grid.add(new Label("Valor Total:"), 0, 2);
+        grid.add(valueBox, 1, 2);
+        grid.add(new Label("Status:"), 2, 2);
+        grid.add(statusComboBox, 3, 2);
+        grid.add(new Label("Observações:"), 0, 3);
+        grid.add(observationsArea, 1, 3, 3, 1);
+
+        dialog.getDialogPane().setContent(grid);
+
+        dialog.setResultConverter(dialogButton -> {
+            if (dialogButton == ButtonType.OK) {
+                return new Reservation(
+                    clientComboBox.getValue(),
+                    packageComboBox.getValue(),
+                    travelDatePicker.getValue(),
+                    Integer.parseInt(passengersField.getText()),
+                    Double.parseDouble(valueField.getText()),
+                    statusComboBox.getValue()
+                );
+            }
+            return null;
+        });
+
+        return dialog.showAndWait();
     }
 
     private void showAlert(Alert.AlertType type, String title, String message) {
