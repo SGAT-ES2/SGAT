@@ -49,14 +49,19 @@ public class LoginView {
         loginButton.getStyleClass().add("login-button");
 
         loginButton.setOnAction(e -> {
-            if (emailField.getText().isEmpty() || passwordField.getText().isEmpty()) {
-                showAlert(Alert.AlertType.ERROR, "Erro no login", "Por favor, preencha todos os campos");
-            } else {
-                Stage stage = (Stage) loginButton.getScene().getWindow();
+            String username = emailField.getText();
+            String password = passwordField.getText();
+            Stage stage = (Stage) loginButton.getScene().getWindow();
+
+            if (username.isEmpty() || password.isEmpty()) {
+                showAlert(stage, Alert.AlertType.ERROR, "Erro no login", "Por favor, preencha todos os campos");
+            } else if (username.equals("admin") && password.equals("admin123")) {
                 MainLayout mainLayout = new MainLayout();
                 Scene scene = stage.getScene();
                 scene.setRoot(mainLayout.getLayout());
                 stage.setFullScreen(true);
+            } else {
+                showAlert(stage, Alert.AlertType.ERROR, "Erro no login", "Usuário ou senha inválidos.");
             }
         });
 
@@ -93,8 +98,9 @@ public class LoginView {
         return stack;
     }
 
-    private void showAlert(Alert.AlertType alertType, String title, String message) {
+    private void showAlert(Stage ownerStage, Alert.AlertType alertType, String title, String message) {
         Alert alert = new Alert(alertType);
+        alert.initOwner(ownerStage);
         alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(message);
