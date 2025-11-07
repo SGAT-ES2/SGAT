@@ -56,7 +56,7 @@ public class LoginView {
             if (username.isEmpty() || password.isEmpty()) {
                 showAlert(stage, Alert.AlertType.ERROR, "Erro no login", "Por favor, preencha todos os campos");
             } else if (username.equals("admin") && password.equals("admin123")) {
-                MainLayout mainLayout = new MainLayout();
+                MainLayout mainLayout = new MainLayout(stage);
                 Scene scene = stage.getScene();
                 scene.setRoot(mainLayout.getLayout());
                 stage.setFullScreen(true);

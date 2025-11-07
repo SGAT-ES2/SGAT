@@ -3,6 +3,7 @@ package com.sgat.view;
 import com.sgat.model.Activity;
 import com.sgat.model.Day;
 import com.sgat.model.Itinerary;
+import javafx.stage.Stage;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -17,6 +18,7 @@ import java.util.Optional;
 
 public class ItinerariesView {
 
+    private final Stage stage;
     private final VBox view;
     private final ObservableList<Itinerary> itineraries = FXCollections.observableArrayList();
 
@@ -30,7 +32,8 @@ public class ItinerariesView {
     private static final String UTENSILS_ICON = "M16 2v20M8 2v20M12 2v20";
 
 
-    public ItinerariesView() {
+    public ItinerariesView(Stage stage) {
+        this.stage = stage;
         view = new VBox(24);
         view.setPadding(new Insets(24));
         view.getStyleClass().add("page");
@@ -206,6 +209,7 @@ public class ItinerariesView {
 
     private void showGenerateItineraryDialog() {
         Dialog<ButtonType> dialog = new Dialog<>();
+        dialog.initOwner(this.stage);
         dialog.setTitle("Gerar Novo Itinerário");
         dialog.setHeaderText("Preencha as informações para gerar um novo itinerário.");
 

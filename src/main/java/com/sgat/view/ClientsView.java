@@ -1,6 +1,7 @@
 package com.sgat.view;
 
 import com.sgat.model.Client;
+import javafx.stage.Stage;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -14,11 +15,13 @@ import javafx.scene.shape.SVGPath;
 import java.util.Optional;
 
 public class ClientsView {
+    private final Stage stage;
     private final VBox view;
     private TableView<Client> table;
     private final ObservableList<Client> clients = FXCollections.observableArrayList();
 
-    public ClientsView() {
+    public ClientsView(Stage stage) {
+        this.stage = stage;
         view = new VBox(24);
         view.setPadding(new Insets(24));
 
@@ -146,6 +149,7 @@ public class ClientsView {
 
     private Optional<Client> showClientDialog(Client client) {
         Dialog<Client> dialog = new Dialog<>();
+        dialog.initOwner(this.stage);
         dialog.setTitle(client == null ? "Adicionar Novo Cliente" : "Editar Cliente");
         dialog.setHeaderText(client == null ? "Preencha as informações do novo cliente." : "Atualize as informações do cliente.");
 

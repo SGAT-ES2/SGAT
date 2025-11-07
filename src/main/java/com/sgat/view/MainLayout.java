@@ -10,6 +10,7 @@ import javafx.beans.binding.Bindings;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
+import javafx.stage.Stage;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.shape.SVGPath;
@@ -27,6 +28,7 @@ import org.kordamp.ikonli.materialdesign2.MaterialDesignV; // Para MDI_VIEW_DASH
 public class MainLayout {
 
     private final BorderPane mainLayout;
+    private final Stage stage;
     private final BooleanProperty sidebarCollapsed = new SimpleBooleanProperty(false);
     private VBox sidebar; // Tornando a sidebar um campo da classe
     private final StackPane contentStack;
@@ -34,16 +36,17 @@ public class MainLayout {
     private final ToggleGroup toggleGroup = new ToggleGroup();
     private final int ICON_SIZE = 20;
 
-    public MainLayout() {
+    public MainLayout(Stage stage) {
+        this.stage = stage;
         mainLayout = new BorderPane();
         contentStack = new StackPane();
 
         // Pre-carrega as views
         views.put("Dashboard", new DashboardView().getView());
-        views.put("Pacotes", new PackagesView().getView());
-        views.put("Clientes", new ClientsView().getView());
-        views.put("Reservas", new ReservationsView().getView());
-        views.put("Itinerários", new ItinerariesView().getView());
+        views.put("Pacotes", new PackagesView(stage).getView());
+        views.put("Clientes", new ClientsView(stage).getView());
+        views.put("Reservas", new ReservationsView(stage).getView());
+        views.put("Itinerários", new ItinerariesView(stage).getView());
 
         contentStack.getChildren().addAll(views.values());
 
