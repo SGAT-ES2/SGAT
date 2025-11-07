@@ -284,6 +284,11 @@
     -fx-text-fill: #E65100; /* orange-dark */
 }
 
+.status-cancelada {
+    -fx-background-color: #FFEBEE; /* red-light (PENDENTE CRÍTICO/R$ 0,00) */
+    -fx-text-fill: #D32F2F; /* red-dark */
+}
+
 .package-icon-container {
     -fx-background-color: #E3F2FD;
     -fx-padding: 8;

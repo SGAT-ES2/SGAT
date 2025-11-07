@@ -1,29 +1,38 @@
 package com.sgat.view;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.kordamp.ikonli.javafx.FontIcon;
+import org.kordamp.ikonli.materialdesign2.MaterialDesignA;
+import org.kordamp.ikonli.materialdesign2.MaterialDesignC;
+import org.kordamp.ikonli.materialdesign2.MaterialDesignL;
+import org.kordamp.ikonli.materialdesign2.MaterialDesignM;
+import org.kordamp.ikonli.materialdesign2.MaterialDesignP;
+import org.kordamp.ikonli.materialdesign2.MaterialDesignV;
+
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.binding.Bindings;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.control.*;
-import javafx.scene.layout.*;
+import javafx.scene.Node; // Para MDI_ACCOUNT_MULTIPLE
+import javafx.scene.Parent; // Para MDI_CALENDAR, MDI_CREDIT_CARD, MDI_CHART_BAR
+import javafx.scene.control.Button; // Para MDI_LOGOUT
+import javafx.scene.control.Label; // Para MDI_MAP_MARKER
+import javafx.scene.control.ScrollPane; // Para MDI_PACKAGE_VARIANT_CLOSED
+import javafx.scene.control.ToggleButton; // Para MDI_VIEW_DASHBOARD
+import javafx.scene.control.ToggleGroup;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.shape.SVGPath;
 import javafx.util.Duration;
-import org.kordamp.ikonli.javafx.FontIcon;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.kordamp.ikonli.materialdesign2.MaterialDesignA; // Para MDI_ACCOUNT_MULTIPLE
-import org.kordamp.ikonli.materialdesign2.MaterialDesignC; // Para MDI_CALENDAR, MDI_CREDIT_CARD, MDI_CHART_BAR
-import org.kordamp.ikonli.materialdesign2.MaterialDesignL; // Para MDI_LOGOUT
-import org.kordamp.ikonli.materialdesign2.MaterialDesignM; // Para MDI_MAP_MARKER
-import org.kordamp.ikonli.materialdesign2.MaterialDesignP; // Para MDI_PACKAGE_VARIANT_CLOSED
-import org.kordamp.ikonli.materialdesign2.MaterialDesignV; // Para MDI_VIEW_DASHBOARD
 public class MainLayout {
 
     private final BorderPane mainLayout;
@@ -43,7 +52,8 @@ public class MainLayout {
         views.put("Pacotes", new PackagesView().getView());
         views.put("Clientes", new ClientsView().getView());
         views.put("Reservas", new ReservationsView().getView());
-
+        views.put("Relatórios", new ReportsView().getView());
+        views.put("Pagamentos", new PaymentsView().getView());
         contentStack.getChildren().addAll(views.values());
 
         createSidebar();
