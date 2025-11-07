@@ -54,9 +54,9 @@ public class MainLayout {
 
         // Pre-carrega as views
         views.put("Dashboard", new DashboardView().getView());
-        views.put("Pacotes", new PackagesView().getView());
-        views.put("Clientes", new ClientsView().getView());
-        views.put("Reservas", new ReservationsView().getView());
+        views.put("Pacotes", new PackagesView(stage).getView());
+        views.put("Clientes", new ClientsView(stage).getView());
+        views.put("Reservas", new ReservationsView(stage).getView());
         views.put("Itinerários", new ItinerariesView(stage).getView());
         views.put("Relatórios", new ReportsView().getView());
         views.put("Pagamentos", new PaymentsView().getView());

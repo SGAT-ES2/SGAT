@@ -4,7 +4,6 @@ import com.sgat.model.Client;
 import com.sgat.model.Package;
 import com.sgat.model.Reservation;
 import javafx.stage.Stage;
-import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
