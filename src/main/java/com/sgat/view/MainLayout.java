@@ -43,6 +43,7 @@ public class MainLayout {
         views.put("Pacotes", new PackagesView().getView());
         views.put("Clientes", new ClientsView().getView());
         views.put("Reservas", new ReservationsView().getView());
+        views.put("Itinerários", new ItinerariesView().getView());
 
         contentStack.getChildren().addAll(views.values());
 
