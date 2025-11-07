@@ -22,6 +22,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Node; // Para MDI_ACCOUNT_MULTIPLE
 import javafx.scene.Parent; // Para MDI_CALENDAR, MDI_CREDIT_CARD, MDI_CHART_BAR
 import javafx.scene.control.Button; // Para MDI_LOGOUT
+import javafx.stage.Stage;
 import javafx.scene.control.Label; // Para MDI_MAP_MARKER
 import javafx.scene.control.ScrollPane; // Para MDI_PACKAGE_VARIANT_CLOSED
 import javafx.scene.control.ToggleButton; // Para MDI_VIEW_DASHBOARD
@@ -31,11 +32,14 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.control.*;
+import javafx.scene.layout.*;
 import javafx.scene.shape.SVGPath;
 import javafx.util.Duration;
 public class MainLayout {
 
     private final BorderPane mainLayout;
+    private final Stage stage;
     private final BooleanProperty sidebarCollapsed = new SimpleBooleanProperty(false);
     private VBox sidebar; // Tornando a sidebar um campo da classe
     private final StackPane contentStack;
@@ -43,7 +47,8 @@ public class MainLayout {
     private final ToggleGroup toggleGroup = new ToggleGroup();
     private final int ICON_SIZE = 20;
 
-    public MainLayout() {
+    public MainLayout(Stage stage) {
+        this.stage = stage;
         mainLayout = new BorderPane();
         contentStack = new StackPane();
 
@@ -52,6 +57,7 @@ public class MainLayout {
         views.put("Pacotes", new PackagesView().getView());
         views.put("Clientes", new ClientsView().getView());
         views.put("Reservas", new ReservationsView().getView());
+        views.put("Itinerários", new ItinerariesView(stage).getView());
         views.put("Relatórios", new ReportsView().getView());
         views.put("Pagamentos", new PaymentsView().getView());
         contentStack.getChildren().addAll(views.values());

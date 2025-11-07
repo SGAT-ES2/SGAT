@@ -3,6 +3,7 @@ package com.sgat.view;
 import com.sgat.model.Client;
 import com.sgat.model.Package;
 import com.sgat.model.Reservation;
+import javafx.stage.Stage;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -24,12 +25,14 @@ import org.kordamp.ikonli.materialdesign2.MaterialDesignP; // Para MDI_PACKAGE_V
 
 
 public class ReservationsView {
+    private final Stage stage;
     private final VBox view;
     private TableView<Reservation> table;
     private final ObservableList<Reservation> reservations = FXCollections.observableArrayList();
     private final int CELL_ICON_SIZE = 18;
 
-    public ReservationsView() {
+    public ReservationsView(Stage stage) {
+        this.stage = stage;
         view = new VBox(24);
         view.setPadding(new Insets(24));
 
@@ -147,6 +150,7 @@ public class ReservationsView {
 
     private Optional<Reservation> showReservationDialog(Reservation reservation) {
         Dialog<Reservation> dialog = new Dialog<>();
+        dialog.initOwner(this.stage);
         dialog.setTitle(reservation == null ? "Adicionar Nova Reserva" : "Editar Reserva");
         dialog.setHeaderText(reservation == null ? "Preencha as informações da nova reserva." : "Atualize as informações da reserva.");
 

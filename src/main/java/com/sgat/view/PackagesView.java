@@ -1,6 +1,7 @@
 package com.sgat.view;
 
 import com.sgat.model.Package;
+import javafx.stage.Stage;
 import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
@@ -20,12 +21,14 @@ import java.util.Locale;
 import java.util.Optional;
 
 public class PackagesView {
+    private final Stage stage;
     private final VBox view;
     private final TilePane packagesGrid;
     private final ObservableList<Package> packages = FXCollections.observableArrayList();
     private final NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(new Locale("pt", "BR"));
 
-    public PackagesView() {
+    public PackagesView(Stage stage) {
+        this.stage = stage;
         view = new VBox(24);
         view.setPadding(new Insets(24));
 
@@ -202,6 +205,7 @@ public class PackagesView {
 
     private Optional<Package> showPackageDialog(Package pkg) {
         Dialog<Package> dialog = new Dialog<>();
+        dialog.initOwner(this.stage);
         dialog.setTitle(pkg == null ? "Adicionar Novo Pacote" : "Editar Pacote");
         dialog.setHeaderText(pkg == null ? "Preencha as informações do novo pacote." : "Atualize as informações do pacote.");
 
