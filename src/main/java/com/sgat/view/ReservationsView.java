@@ -28,7 +28,6 @@ public class ReservationsView {
     private final VBox view;
     private TableView<Reservation> table;
     private final ObservableList<Reservation> reservations = FXCollections.observableArrayList();
-    private final int CELL_ICON_SIZE = 18;
 
     public ReservationsView(Stage stage) {
         this.stage = stage;
@@ -49,15 +48,15 @@ public class ReservationsView {
     }
 
     private void setupData() {
-        Client client1 = new Client("Beatriz Oliveira", "beatriz.oliveira@example.com", "(11) 98765-4321", "123.456.789-00", "Rua das Flores, 123, São Paulo, SP", "Prefere destinos de praia e resorts all-inclusive. Gosta de viajar em família.", 5);
-        Client client2 = new Client("Carlos Pereira", "carlos.pereira@example.com", "(21) 91234-5678", "987.654.321-00", "Avenida Copacabana, 456, Rio de Janeiro, RJ", "Interessado em turismo de aventura, como trilhas e montanhismo. Viagens solo.", 8);
+        Client client1 = new Client(1, "Beatriz Oliveira", "beatriz.oliveira@example.com", "(11) 98765-4321", "123.456.789-00", "Rua das Flores, 123, São Paulo, SP", "Prefere destinos de praia e resorts all-inclusive. Gosta de viajar em família.", 5);
+        Client client2 = new Client(2, "Carlos Pereira", "carlos.pereira@example.com", "(21) 91234-5678", "987.654.321-00", "Avenida Copacabana, 456, Rio de Janeiro, RJ", "Interessado em turismo de aventura, como trilhas e montanhismo. Viagens solo.", 8);
 
         Package package1 = new Package("Férias em Cancún", "Cancún", "Pacote de 7 dias em resort all-inclusive", "7 dias", 2500.00, LocalDate.of(2025, 10, 20), LocalDate.of(2025, 10, 27), "Inclui passagem aérea, hospedagem e passeios.");
         Package package2 = new Package("Aventura na Patagônia", "Patagônia", "Pacote de 10 dias com trilhas e escaladas", "10 dias", 4500.00, LocalDate.of(2025, 11, 15), LocalDate.of(2025, 11, 25), "Inclui guias, equipamentos e acomodação em refúgios de montanha.");
 
         reservations.addAll(
-            new Reservation(client1, package1, LocalDate.of(2025, 10, 20), 2, 5000.00, "Confirmada"),
-            new Reservation(client2, package2, LocalDate.of(2025, 11, 15), 1, 4500.00, "Pendente")
+            new Reservation(1, client1, package1, LocalDate.of(2025, 10, 20), 2, 5000.00, "Confirmada"),
+            new Reservation(2, client2, package2, LocalDate.of(2025, 11, 15), 1, 4500.00, "Pendente")
         );
     }
 
@@ -165,8 +164,8 @@ public class ReservationsView {
         ComboBox<Client> clientComboBox = new ComboBox<>();
         // Dummy data for clients
         ObservableList<Client> clients = FXCollections.observableArrayList(
-            new Client("Beatriz Oliveira", "beatriz.oliveira@example.com", "(11) 98765-4321", "123.456.789-00", "Rua das Flores, 123, São Paulo, SP", "Prefere destinos de praia e resorts all-inclusive. Gosta de viajar em família.", 5),
-            new Client("Carlos Pereira", "carlos.pereira@example.com", "(21) 91234-5678", "987.654.321-00", "Avenida Copacabana, 456, Rio de Janeiro, RJ", "Interessado em turismo de aventura, como trilhas e montanhismo. Viagens solo.", 8)
+            new Client(1, "Beatriz Oliveira", "beatriz.oliveira@example.com", "(11) 98765-4321", "123.456.789-00", "Rua das Flores, 123, São Paulo, SP", "Prefere destinos de praia e resorts all-inclusive. Gosta de viajar em família.", 5),
+            new Client(2, "Carlos Pereira", "carlos.pereira@example.com", "(21) 91234-5678", "987.654.321-00", "Avenida Copacabana, 456, Rio de Janeiro, RJ", "Interessado em turismo de aventura, como trilhas e montanhismo. Viagens solo.", 8)
         );
         clientComboBox.setItems(clients);
 
@@ -224,6 +223,7 @@ public class ReservationsView {
         dialog.setResultConverter(dialogButton -> {
             if (dialogButton == ButtonType.OK) {
                 return new Reservation(
+                    reservations.size() + 1,
                     clientComboBox.getValue(),
                     packageComboBox.getValue(),
                     travelDatePicker.getValue(),
@@ -289,8 +289,7 @@ public class ReservationsView {
             box = new HBox(12);
             box.setAlignment(Pos.CENTER_LEFT);
             icon = new FontIcon(MaterialDesignA.ACCOUNT);
-            icon.setIconSize(CELL_ICON_SIZE);
-            icon.getStyleClass().add("icon-svg");
+            icon.getStyleClass().add("table-icon");
             label = new Label();
             box.getChildren().addAll(icon, label);
             setGraphic(box);
@@ -317,8 +316,7 @@ public class ReservationsView {
             box = new HBox(12);
             box.setAlignment(Pos.CENTER_LEFT);
             icon = new FontIcon(MaterialDesignP.PACKAGE_VARIANT_CLOSED);
-            icon.setIconSize(CELL_ICON_SIZE);
-            icon.getStyleClass().add("icon-svg");
+            icon.getStyleClass().add("table-icon");
             label = new Label();
             box.getChildren().addAll(icon, label);
             setGraphic(box);
@@ -345,8 +343,7 @@ public class ReservationsView {
             box = new HBox(12);
             box.setAlignment(Pos.CENTER_LEFT);
             icon = new FontIcon(MaterialDesignC.CALENDAR);
-            icon.setIconSize(CELL_ICON_SIZE);
-            icon.getStyleClass().add("icon-svg");
+            icon.getStyleClass().add("table-icon");
             label = new Label();
             box.getChildren().addAll(icon, label);
             setGraphic(box);

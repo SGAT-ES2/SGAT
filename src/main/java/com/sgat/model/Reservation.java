@@ -14,6 +14,7 @@ import java.time.LocalDate;
 
 public class Reservation {
 
+    private final IntegerProperty id;
     private final ObjectProperty<Client> client;
     private final ObjectProperty<Package> travelPackage;
     private final ObjectProperty<LocalDate> travelDate;
@@ -21,7 +22,8 @@ public class Reservation {
     private final DoubleProperty totalValue;
     private final StringProperty status;
 
-    public Reservation(Client client, Package travelPackage, LocalDate travelDate, int numberOfPassengers, double totalValue, String status) {
+    public Reservation(int id, Client client, Package travelPackage, LocalDate travelDate, int numberOfPassengers, double totalValue, String status) {
+        this.id = new SimpleIntegerProperty(id);
         this.client = new SimpleObjectProperty<>(client);
         this.travelPackage = new SimpleObjectProperty<>(travelPackage);
         this.travelDate = new SimpleObjectProperty<>(travelDate);
@@ -31,6 +33,9 @@ public class Reservation {
     }
 
     // --- Getters and Properties ---
+
+    public int getId() { return id.get(); }
+    public IntegerProperty idProperty() { return id; }
 
     public Client getClient() {
         return client.get();

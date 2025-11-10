@@ -5,6 +5,7 @@
 .root {
     -fx-font-family: "Inter", sans-serif;
     -fx-background-color: #F8F9FA; /* Um cinza muito claro */
+    -fx-primary-text-color: #212121; /* Cor de texto primária */
 }
 
 .icon-svg {
@@ -390,6 +391,7 @@
     -fx-border-width: 1;
     -fx-background-radius: 8;
     -fx-border-radius: 8;
+    -fx-alignment: left;
 }
 
 .table-view .column-header-background {
@@ -401,13 +403,21 @@
     -fx-font-size: 12px;
     -fx-text-fill: #757575;
     -fx-padding: 8 16;
+    -fx-alignment: left;
 }
 
 .table-view .table-cell {
-    -fx-padding: 12 16;
+    -fx-padding: 16; /* Aumenta o padding para dar mais respiro */
     -fx-border-color: transparent transparent #F0F0F0 transparent;
-    -fx-font-size: 13px;
+    -fx-font-size: 14px; /* Aumenta o tamanho da fonte */
+    -fx-alignment: left; /* Alinha o conteúdo da célula à esquerda */
 }
+
+.table-icon {
+    -fx-font-size: 18px; /* Tamanho específico para ícones na tabela */
+    -fx-fill: black;
+}
+
 
 .table-view .table-row-cell:empty {
     -fx-background-color: transparent;
