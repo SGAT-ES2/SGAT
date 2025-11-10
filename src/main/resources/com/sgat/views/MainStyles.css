@@ -5,6 +5,7 @@
 .root {
     -fx-font-family: "Inter", sans-serif;
     -fx-background-color: #F8F9FA; /* Um cinza muito claro */
+    -fx-primary-text-color: #212121; /* Cor de texto primária */
 }
 
 .icon-svg {
@@ -284,6 +285,11 @@
     -fx-text-fill: #E65100; /* orange-dark */
 }
 
+.status-cancelada {
+    -fx-background-color: #FFEBEE; /* red-light (PENDENTE CRÍTICO/R$ 0,00) */
+    -fx-text-fill: #D32F2F; /* red-dark */
+}
+
 .package-icon-container {
     -fx-background-color: #E3F2FD;
     -fx-padding: 8;
@@ -385,6 +391,7 @@
     -fx-border-width: 1;
     -fx-background-radius: 8;
     -fx-border-radius: 8;
+    -fx-alignment: left;
 }
 
 .table-view .column-header-background {
@@ -396,13 +403,21 @@
     -fx-font-size: 12px;
     -fx-text-fill: #757575;
     -fx-padding: 8 16;
+    -fx-alignment: left;
 }
 
 .table-view .table-cell {
-    -fx-padding: 12 16;
+    -fx-padding: 16; /* Aumenta o padding para dar mais respiro */
     -fx-border-color: transparent transparent #F0F0F0 transparent;
-    -fx-font-size: 13px;
+    -fx-font-size: 14px; /* Aumenta o tamanho da fonte */
+    -fx-alignment: left; /* Alinha o conteúdo da célula à esquerda */
 }
+
+.table-icon {
+    -fx-font-size: 18px; /* Tamanho específico para ícones na tabela */
+    -fx-fill: black;
+}
+
 
 .table-view .table-row-cell:empty {
     -fx-background-color: transparent;
@@ -457,6 +472,7 @@
     -fx-background-radius: 15;
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 20, 0, 0, 5);
     -fx-max-width: 400;
+    -fx-max-height: 500;
     -fx-alignment: top-center;
 }
 
@@ -510,6 +526,8 @@
     -fx-padding: 12;
     -fx-cursor: hand;
     -fx-font-size: 16px;
+    -fx-max-width: 200;
+    -fx-alignment: center;
 }
 
 .login-button:hover {

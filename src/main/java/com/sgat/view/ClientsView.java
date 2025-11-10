@@ -1,6 +1,8 @@
 package com.sgat.view;
 
+import com.sgat.controller.ClientsController;
 import com.sgat.model.Client;
+import javafx.stage.Stage;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -10,15 +12,22 @@ import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.shape.SVGPath;
+import org.kordamp.ikonli.javafx.FontIcon;
+import org.kordamp.ikonli.materialdesign2.*;
 
 import java.util.Optional;
 
 public class ClientsView {
+    private final Stage stage;
     private final VBox view;
+    private final ClientsController controller;
     private TableView<Client> table;
-    private final ObservableList<Client> clients = FXCollections.observableArrayList();
+    private final ObservableList<Client> clients;
 
-    public ClientsView() {
+    public ClientsView(Stage stage) {
+        this.stage = stage;
+        this.clients = FXCollections.observableArrayList();
+        this.controller = new ClientsController(this, clients);
         view = new VBox(24);
         view.setPadding(new Insets(24));
 
@@ -37,9 +46,9 @@ public class ClientsView {
 
     private void setupData() {
         clients.addAll(
-            new Client("Beatriz Oliveira", "beatriz.oliveira@example.com", "(11) 98765-4321", "123.456.789-00", "Rua das Flores, 123, São Paulo, SP", "Prefere destinos de praia e resorts all-inclusive. Gosta de viajar em família.", 5),
-            new Client("Carlos Pereira", "carlos.pereira@example.com", "(21) 91234-5678", "987.654.321-00", "Avenida Copacabana, 456, Rio de Janeiro, RJ", "Interessado em turismo de aventura, como trilhas e montanhismo. Viagens solo.", 8),
-            new Client("Fernanda Costa", "fernanda.costa@example.com", "(31) 99999-8888", "456.789.123-00", "Rua da Bahia, 789, Belo Horizonte, MG", "Foco em viagens culturais, museus, e gastronomia local. Viaja com o parceiro.", 3)
+            new Client(1, "Beatriz Oliveira", "beatriz.oliveira@example.com", "(11) 98765-4321", "123.456.789-00", "Rua das Flores, 123, São Paulo, SP", "Prefere destinos de praia e resorts all-inclusive. Gosta de viajar em família.", 5),
+            new Client(2, "Carlos Pereira", "carlos.pereira@example.com", "(21) 91234-5678", "987.654.321-00", "Avenida Copacabana, 456, Rio de Janeiro, RJ", "Interessado em turismo de aventura, como trilhas e montanhismo. Viagens solo.", 8),
+            new Client(3, "Fernanda Costa", "fernanda.costa@example.com", "(31) 99999-8888", "456.789.123-00", "Rua da Bahia, 789, Belo Horizonte, MG", "Foco em viagens culturais, museus, e gastronomia local. Viaja com o parceiro.", 3)
         );
     }
 
@@ -59,8 +68,7 @@ public class ClientsView {
 
         Button newClientButton = new Button("Novo Cliente");
         newClientButton.getStyleClass().add("add-button");
-        SVGPath plusIcon = new SVGPath();
-        plusIcon.setContent("M12 5v14m-7-7h14");
+        FontIcon plusIcon = new FontIcon(MaterialDesignP.PLUS);
         newClientButton.setGraphic(plusIcon);
         newClientButton.setOnAction(e -> handleAddClient());
 
@@ -119,13 +127,14 @@ public class ClientsView {
 
     private void handleAddClient() {
         showClientDialog(null).ifPresent(client -> {
-            clients.add(client);
+            controller.addClient(client);
             showAlert(Alert.AlertType.INFORMATION, "Cliente Adicionado", "Novo cliente cadastrado com sucesso.");
         });
     }
 
     private void handleEditClient(Client client) {
         showClientDialog(client).ifPresent(editedClient -> {
+            controller.updateClient(editedClient);
             showAlert(Alert.AlertType.INFORMATION, "Cliente Atualizado", "Os dados do cliente foram atualizados.");
         });
     }
@@ -138,7 +147,7 @@ public class ClientsView {
 
         confirmation.showAndWait().ifPresent(response -> {
             if (response == ButtonType.OK) {
-                clients.remove(client);
+                controller.deleteClient(client);
                 showAlert(Alert.AlertType.INFORMATION, "Cliente Removido", "O cliente foi removido com sucesso.");
             }
         });
@@ -146,6 +155,7 @@ public class ClientsView {
 
     private Optional<Client> showClientDialog(Client client) {
         Dialog<Client> dialog = new Dialog<>();
+        dialog.initOwner(this.stage);
         dialog.setTitle(client == null ? "Adicionar Novo Cliente" : "Editar Cliente");
         dialog.setHeaderText(client == null ? "Preencha as informações do novo cliente." : "Atualize as informações do cliente.");
 
@@ -191,7 +201,7 @@ public class ClientsView {
         dialog.setResultConverter(dialogButton -> {
             if (dialogButton == ButtonType.OK) {
                 if (client == null) {
-                    return new Client(nameField.getText(), emailField.getText(), phoneField.getText(), cpfField.getText(), addressField.getText(), prefsArea.getText(), 0);
+                    return new Client(clients.size() + 1, nameField.getText(), emailField.getText(), phoneField.getText(), cpfField.getText(), addressField.getText(), prefsArea.getText(), 0);
                 } else {
                     client.setName(nameField.getText());
                     client.setEmail(emailField.getText());
@@ -227,9 +237,8 @@ public class ClientsView {
             box = new HBox(12);
             box.setAlignment(Pos.CENTER_LEFT);
             iconContainer = new StackPane();
-            iconContainer.getStyleClass().add("user-icon-container");
-            SVGPath userIcon = new SVGPath();
-            userIcon.setContent("M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2");
+            FontIcon userIcon = new FontIcon(MaterialDesignA.ACCOUNT);
+            userIcon.getStyleClass().add("table-icon");
             iconContainer.getChildren().add(userIcon);
             label = new Label();
             box.getChildren().addAll(iconContainer, label);
@@ -264,13 +273,13 @@ public class ClientsView {
             } else {
                 box.getChildren().clear();
                 HBox emailBox = new HBox(4);
-                SVGPath emailIcon = new SVGPath();
-                emailIcon.setContent("M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z");
+                FontIcon emailIcon = new FontIcon(MaterialDesignE.EMAIL);
+                emailIcon.getStyleClass().add("table-icon");
                 emailBox.getChildren().addAll(emailIcon, new Label(client.getEmail()));
 
                 HBox phoneBox = new HBox(4);
-                SVGPath phoneIcon = new SVGPath();
-                phoneIcon.setContent("M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.63A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z");
+                FontIcon phoneIcon = new FontIcon(MaterialDesignP.PHONE);
+                phoneIcon.getStyleClass().add("table-icon");
                 phoneBox.getChildren().addAll(phoneIcon, new Label(client.getPhone()));
 
                 box.getChildren().addAll(emailBox, phoneBox);
@@ -311,13 +320,15 @@ public class ClientsView {
             box.setAlignment(Pos.CENTER);
 
             editButton.getStyleClass().addAll("icon-button");
-            SVGPath editIcon = new SVGPath();
-            editIcon.setContent("M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z");
+            FontIcon editIcon = new FontIcon(MaterialDesignP.PENCIL);
+            editIcon.setIconSize(20);
+            editIcon.getStyleClass().add("table-icon");
             editButton.setGraphic(editIcon);
 
             deleteButton.getStyleClass().addAll("icon-button", "delete-button");
-            SVGPath deleteIcon = new SVGPath();
-            deleteIcon.setContent("M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2");
+            FontIcon deleteIcon = new FontIcon(MaterialDesignD.DELETE);
+            deleteIcon.setIconSize(20);
+            deleteIcon.getStyleClass().add("table-icon");
             deleteButton.setGraphic(deleteIcon);
 
             box.getChildren().addAll(editButton, deleteButton);
