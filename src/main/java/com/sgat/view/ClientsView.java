@@ -141,6 +141,7 @@ public class ClientsView {
 
     private void handleDeleteClient(Client client) {
         Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION);
+        confirmation.initOwner(this.stage);
         confirmation.setTitle("Confirmar Exclusão");
         confirmation.setHeaderText("Excluir Cliente: " + client.getName());
         confirmation.setContentText("Você tem certeza que deseja remover este cliente?");
@@ -220,6 +221,7 @@ public class ClientsView {
 
     private void showAlert(Alert.AlertType type, String title, String message) {
         Alert alert = new Alert(type);
+        alert.initOwner(this.stage);
         alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(message);
