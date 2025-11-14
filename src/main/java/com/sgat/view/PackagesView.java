@@ -189,6 +189,7 @@ public class PackagesView {
 
     private void handleDeletePackage(Package pkg) {
         Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION);
+        confirmation.initOwner(this.stage);
         confirmation.setTitle("Confirmar Exclusão");
         confirmation.setHeaderText("Excluir Pacote: " + pkg.getName());
         confirmation.setContentText("Você tem certeza que deseja remover este pacote? Esta ação não pode ser desfeita.");
@@ -299,6 +300,7 @@ public class PackagesView {
 
     private void showAlert(Alert.AlertType type, String title, String message) {
         Alert alert = new Alert(type);
+        alert.initOwner(this.stage);
         alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(message);
