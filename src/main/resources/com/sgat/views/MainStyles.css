@@ -291,7 +291,7 @@
 }
 
 .package-icon-container {
-    -fx-background-color: #E3F2FD;
+    -fx-background-color: white;
     -fx-padding: 8;
     -fx-background-radius: 50;
     -fx-min-width: 36;
@@ -300,7 +300,7 @@
 }
 
 .package-icon-container .icon-svg {
-    -fx-fill: #1E88E5;
+    -fx-fill: black;
 }
 
 /* ==========================================================================
