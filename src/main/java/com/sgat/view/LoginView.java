@@ -1,12 +1,11 @@
 package com.sgat.view;
 
 import com.sgat.view.MainLayout;
-import javafx.scene.Scene;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
-import javafx.scene.control.Alert;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
@@ -15,6 +14,9 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.SVGPath;
 import javafx.stage.Stage;
+import org.kordamp.ikonli.javafx.FontIcon;
+import org.kordamp.ikonli.materialdesign2.MaterialDesignK;
+import org.kordamp.ikonli.materialdesign2.MaterialDesignL;
 
 public class LoginView {
 
@@ -26,49 +28,70 @@ public class LoginView {
         card.getStyleClass().add("card");
         card.setMaxWidth(400);
 
-        // Header
         Node iconContainer = createIconContainer();
         Label title = new Label("TravelManager");
         title.getStyleClass().add("card-title");
         Label subtitle = new Label("Sistema de Gestão de Agência de Turismo");
         subtitle.getStyleClass().add("card-subtitle");
 
-        // Form
+        Label errorLabel = new Label();
+        errorLabel.getStyleClass().add("error-label");
+        errorLabel.setVisible(false);
+        errorLabel.setManaged(false);
+
         Label emailLabel = new Label("Email");
         TextField emailField = new TextField();
         emailField.setPromptText("seu@email.com");
-        Node emailInput = createIconTextField(emailField, "M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z");
+        FontIcon emailIcon = new FontIcon(MaterialDesignK.KEYBOARD_OUTLINE);
+        emailIcon.setIconSize(18);
+        Node emailInput = createIconTextField(emailField, emailIcon);
 
         Label passwordLabel = new Label("Senha");
         PasswordField passwordField = new PasswordField();
         passwordField.setPromptText("••••••••");
-        Node passwordInput = createIconTextField(passwordField, "M12 17a2 2 0 0 0 2-2 2 2 0 0 0-2-2 2 2 0 0 0-2 2 2 2 0 0 0 2 2zm6-9a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V10a2 2 0 0 1 2-2h1V6a5 5 0 0 1 10 0v2h1z");
+        FontIcon passwordIcon = new FontIcon(MaterialDesignL.LOCK_OUTLINE);
+        passwordIcon.setIconSize(18);
+        Node passwordInput = createIconTextField(passwordField, passwordIcon);
 
-        // Login Button
         Button loginButton = new Button("Entrar");
         loginButton.getStyleClass().add("login-button");
+        loginButton.setDefaultButton(true);
 
         loginButton.setOnAction(e -> {
             String username = emailField.getText();
             String password = passwordField.getText();
             Stage stage = (Stage) loginButton.getScene().getWindow();
 
+            errorLabel.setVisible(false);
+            errorLabel.setManaged(false);
+
             if (username.isEmpty() || password.isEmpty()) {
-                showAlert(stage, Alert.AlertType.ERROR, "Erro no login", "Por favor, preencha todos os campos");
+                showError(errorLabel, "Por favor, preencha todos os campos");
             } else if (username.equals("admin") && password.equals("admin123")) {
                 MainLayout mainLayout = new MainLayout(stage);
                 Scene scene = stage.getScene();
                 scene.setRoot(mainLayout.getLayout());
                 stage.setFullScreen(true);
             } else {
-                showAlert(stage, Alert.AlertType.ERROR, "Erro no login", "Usuário ou senha inválidos.");
+                showError(errorLabel, "Usuário ou senha inválidos.");
             }
         });
 
-        card.getChildren().addAll(iconContainer, title, subtitle, emailLabel, emailInput, passwordLabel, passwordInput, loginButton);
+
+        card.getChildren().addAll(iconContainer, title, subtitle,
+                emailLabel, emailInput,
+                passwordLabel, passwordInput,
+                errorLabel,
+                loginButton);
         root.getChildren().add(card);
 
         return root;
+    }
+
+    private void showError(Label errorLabel, String message) {
+        errorLabel.setText(message);
+        errorLabel.setVisible(true);
+        errorLabel.setManaged(true);
     }
 
     private Node createIconContainer() {
@@ -83,10 +106,8 @@ public class LoginView {
         return iconContainer;
     }
 
-    private Node createIconTextField(TextField textField, String svgContent) {
+    private Node createIconTextField(TextField textField, Node icon) {
         StackPane stack = new StackPane();
-        SVGPath icon = new SVGPath();
-        icon.setContent(svgContent);
         icon.getStyleClass().add("input-icon");
         StackPane.setAlignment(icon, Pos.CENTER_LEFT);
         StackPane.setMargin(icon, new Insets(0, 0, 0, 10));
@@ -96,14 +117,5 @@ public class LoginView {
 
         stack.getChildren().addAll(textField, icon);
         return stack;
-    }
-
-    private void showAlert(Stage ownerStage, Alert.AlertType alertType, String title, String message) {
-        Alert alert = new Alert(alertType);
-        alert.initOwner(ownerStage);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
     }
 }
