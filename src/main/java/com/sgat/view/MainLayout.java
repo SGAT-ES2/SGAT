@@ -1,15 +1,13 @@
 package com.sgat.view;
 
-import java.util.HashMap;
+import java.util.HashMap; 
 import java.util.Map;
 
 import org.kordamp.ikonli.javafx.FontIcon;
-import org.kordamp.ikonli.materialdesign2.MaterialDesignA;
-import org.kordamp.ikonli.materialdesign2.MaterialDesignC;
-import org.kordamp.ikonli.materialdesign2.MaterialDesignL;
-import org.kordamp.ikonli.materialdesign2.MaterialDesignM;
-import org.kordamp.ikonli.materialdesign2.MaterialDesignP;
-import org.kordamp.ikonli.materialdesign2.MaterialDesignV;
+import org.kordamp.ikonli.materialdesign2.*;
+
+import com.sgat.controller.PaymentsController;
+import com.sgat.controller.ReportsController; 
 
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
@@ -19,29 +17,28 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.geometry.Pos;
-import javafx.scene.Node; // Para MDI_ACCOUNT_MULTIPLE
-import javafx.scene.Parent; // Para MDI_CALENDAR, MDI_CREDIT_CARD, MDI_CHART_BAR
-import javafx.scene.control.Button; // Para MDI_LOGOUT
-import javafx.stage.Stage;
-import javafx.scene.control.Label; // Para MDI_MAP_MARKER
-import javafx.scene.control.ScrollPane; // Para MDI_PACKAGE_VARIANT_CLOSED
-import javafx.scene.control.ToggleButton; // Para MDI_VIEW_DASHBOARD
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.ToggleButton; 
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.control.*;
-import javafx.scene.layout.*;
 import javafx.scene.shape.SVGPath;
+import javafx.stage.Stage;
 import javafx.util.Duration;
+
 public class MainLayout {
 
     private final BorderPane mainLayout;
     private final Stage stage;
     private final BooleanProperty sidebarCollapsed = new SimpleBooleanProperty(false);
-    private VBox sidebar; // Tornando a sidebar um campo da classe
+    private VBox sidebar; 
     private final StackPane contentStack;
     private final Map<String, Node> views = new HashMap<>();
     private final ToggleGroup toggleGroup = new ToggleGroup();
@@ -52,14 +49,23 @@ public class MainLayout {
         mainLayout = new BorderPane();
         contentStack = new StackPane();
 
-        // Pre-carrega as views
+        // --- INICIALIZAÇÃO DAS VIEWS (MVC) ---
+        PaymentsView paymentsView = new PaymentsView();
+        PaymentsController paymentsController = new PaymentsController(paymentsView);
+        paymentsView.setController(paymentsController); 
+        views.put("Pagamentos", paymentsView.getView()); 
+
+        ReportsView reportsView = new ReportsView();
+        new ReportsController(reportsView); 
+        views.put("Relatórios", reportsView.getView());
+
         views.put("Dashboard", new DashboardView().getView());
-        views.put("Pacotes", new PackagesView().getView());
-        views.put("Clientes", new ClientsView().getView());
-        views.put("Reservas", new ReservationsView().getView());
+        views.put("Pacotes", new PackagesView(stage).getView());
+        views.put("Clientes", new ClientsView(stage).getView());
+        views.put("Reservas", new ReservationsView(stage).getView());
         views.put("Itinerários", new ItinerariesView(stage).getView());
-        views.put("Relatórios", new ReportsView().getView());
-        views.put("Pagamentos", new PaymentsView().getView());
+        // --- FIM DA INICIALIZAÇÃO DE VIEWS ---
+
         contentStack.getChildren().addAll(views.values());
 
         createSidebar();
@@ -76,6 +82,7 @@ public class MainLayout {
         return mainLayout;
     }
 
+    // ---------------- SIDEBAR ----------------
     private void createSidebar() {
         sidebar = new VBox();
         sidebar.getStyleClass().add("sidebar");
@@ -122,28 +129,27 @@ public class MainLayout {
 
     private Node createSidebarNavigation() {
         VBox navigation = new VBox(8);
-
         Label menuHeader = new Label("MENU PRINCIPAL");
         menuHeader.getStyleClass().add("sidebar-menu-header");
         menuHeader.visibleProperty().bind(sidebarCollapsed.not());
         menuHeader.managedProperty().bind(sidebarCollapsed.not());
 
         VBox buttons = new VBox(4);
-        FontIcon dashboardIcon, calendarIcon, packageIcon, clientIcon, payIcon,itineraryIcon, chartIcon;
-        dashboardIcon = new FontIcon(MaterialDesignV.VIEW_DASHBOARD);
+        FontIcon dashboardIcon = new FontIcon(MaterialDesignV.VIEW_DASHBOARD);
         dashboardIcon.setIconSize(ICON_SIZE);
-        packageIcon = new FontIcon(MaterialDesignP.PACKAGE_VARIANT_CLOSED);
+        FontIcon packageIcon = new FontIcon(MaterialDesignP.PACKAGE_VARIANT_CLOSED);
         packageIcon.setIconSize(ICON_SIZE);
-        clientIcon = new FontIcon(MaterialDesignA.ACCOUNT_MULTIPLE);
+        FontIcon clientIcon = new FontIcon(MaterialDesignA.ACCOUNT_MULTIPLE);
         clientIcon.setIconSize(ICON_SIZE);
-        calendarIcon = new FontIcon(MaterialDesignC.CALENDAR);
+        FontIcon calendarIcon = new FontIcon(MaterialDesignC.CALENDAR);
         calendarIcon.setIconSize(ICON_SIZE);
-        payIcon = new FontIcon(MaterialDesignC.CREDIT_CARD);
+        FontIcon payIcon = new FontIcon(MaterialDesignC.CREDIT_CARD);
         payIcon.setIconSize(ICON_SIZE);
-        itineraryIcon = new FontIcon(MaterialDesignM.MAP_MARKER);
+        FontIcon itineraryIcon = new FontIcon(MaterialDesignM.MAP_MARKER);
         itineraryIcon.setIconSize(ICON_SIZE);
-        chartIcon = new FontIcon(MaterialDesignC.CHART_BAR);
+        FontIcon chartIcon = new FontIcon(MaterialDesignC.CHART_BAR);
         chartIcon.setIconSize(ICON_SIZE);
+
         buttons.getChildren().addAll(
                 createNavButton("Dashboard", dashboardIcon),
                 createNavButton("Pacotes", packageIcon),
@@ -158,47 +164,19 @@ public class MainLayout {
         return navigation;
     }
 
-    private ToggleButton createNavButton(String text, String svgPath) {
-        ToggleButton button = new ToggleButton();
-        button.setToggleGroup(toggleGroup);
-        button.getStyleClass().add("sidebar-menu-button");
-        button.setUserData(text); // Associa o nome da view ao botão
-
-        SVGPath icon = new SVGPath();
-        icon.setContent(svgPath);
-        icon.getStyleClass().add("icon-svg");
-
-        Label label = new Label(text);
-        label.visibleProperty().bind(sidebarCollapsed.not());
-        label.managedProperty().bind(sidebarCollapsed.not());
-
-        HBox content = new HBox(12, icon, label);
-        content.setAlignment(Pos.CENTER_LEFT);
-        button.setGraphic(content);
-        button.setAlignment(Pos.CENTER_LEFT);
-
-        if (text.equals("Dashboard")) {
-            button.setSelected(true);
-        }
-
-        return button;
-    }
-
     private ToggleButton createNavButton(String text, Node iconNode) {
         ToggleButton button = new ToggleButton();
         button.setToggleGroup(toggleGroup);
         button.getStyleClass().add("sidebar-menu-button");
         button.setUserData(text);
 
-        // Adicionamos a mesma classe de estilo ao FontIcon
-        // para que ele herde o tamanho e a cor do seu CSS!
         iconNode.getStyleClass().add("icon-svg");
 
         Label label = new Label(text);
         label.visibleProperty().bind(sidebarCollapsed.not());
         label.managedProperty().bind(sidebarCollapsed.not());
 
-        HBox content = new HBox(12, iconNode, label); // Usa o iconNode diretamente
+        HBox content = new HBox(12, iconNode, label); 
         content.setAlignment(Pos.CENTER_LEFT);
         button.setGraphic(content);
         button.setAlignment(Pos.CENTER_LEFT);
@@ -206,7 +184,6 @@ public class MainLayout {
         if (text.equals("Dashboard")) {
             button.setSelected(true);
         }
-
         return button;
     }
 
@@ -234,9 +211,9 @@ public class MainLayout {
         return footer;
     }
 
+    // ---------------- ÁREA DE CONTEÚDO ----------------
     private Node createMainContentArea() {
         BorderPane contentArea = new BorderPane();
-
         Node header = createMainContentHeader();
         contentArea.setTop(header);
 
@@ -260,7 +237,7 @@ public class MainLayout {
 
         sidebarTrigger.setOnAction(e -> {
             boolean collapsed = sidebarCollapsed.get();
-            final Timeline timeline = new Timeline();
+            Timeline timeline = new Timeline();
             timeline.setCycleCount(1);
             timeline.setAutoReverse(false);
             KeyValue kv = new KeyValue(sidebar.prefWidthProperty(), collapsed ? 250 : 70);
@@ -273,10 +250,10 @@ public class MainLayout {
         return header;
     }
 
+    // ---------------- TROCA DE VIEWS ----------------
     private void setupViewSwitching() {
         toggleGroup.selectedToggleProperty().addListener((obs, oldToggle, newToggle) -> {
             if (newToggle == null) {
-                // Impede que nenhum botão seja selecionado
                 oldToggle.setSelected(true);
             } else {
                 String viewName = (String) newToggle.getUserData();
