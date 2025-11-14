@@ -1,19 +1,33 @@
 package com.sgat.view;
 
+import com.sgat.controller.ReportData; // Necessário para criar a lista de anos
+import com.sgat.controller.ReportsController;
+
+import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
-import javafx.scene.control.Label;
+import javafx.scene.Node; // Novo import
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color; 
+import javafx.scene.paint.Color;
 
 public class ReportsView {
 
     private final VBox view;
+    
+    // CAMPOS PARA REFERENCIAR E ATUALIZAR OS CARDS DE RESUMO E O CONTROLLER
+    private ReportsController controller;
+    private Label lblTotalReservasValue;
+    private Label lblReceitaTotalValue;
+    private Label lblNovosClientesValue;
+    
+    // Variável para o ComboBox (Menu Suspenso)
+    private ComboBox<String> cmbYearSelector; 
 
     public ReportsView() {
         view = new VBox(24);
@@ -47,24 +61,42 @@ public class ReportsView {
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        // Seletor de Ano (clicável)
-        Label yearSelector = new Label("2025 ▼");
-        yearSelector.setStyle("-fx-border-color: #E0E0E0; -fx-border-width: 1; -fx-border-radius: 8; -fx-padding: 8 16; -fx-background-color: white; -fx-font-weight: bold; -fx-cursor: hand;");
+        // Seletor de Ano (ComboBox)
+        cmbYearSelector = new ComboBox<>(FXCollections.observableArrayList("2025", "2024", "2023"));
+        cmbYearSelector.setValue("2025"); // Define o valor inicial
         
-        yearSelector.setOnMouseClicked(event -> {
-            System.out.println("Ação: Abrir diálogo/dropdown de seleção de ano.");
+        // ESTILO INLINE para ter a aparência de botão/label clicável com borda
+        cmbYearSelector.setStyle(
+            "-fx-border-color: #E0E0E0; " +
+            "-fx-border-width: 1; " +
+            "-fx-border-radius: 8; " +
+            "-fx-padding: 4 8; " + 
+            "-fx-background-color: white; " +
+            "-fx-font-weight: bold; " +
+            "-fx-cursor: hand;"
+        );
+        
+        // AÇÃO: Quando um novo ano é selecionado no ComboBox
+        cmbYearSelector.setOnAction(event -> {
+            String selectedYear = cmbYearSelector.getValue();
+            if (selectedYear != null && controller != null) {
+                // Chama o Controller para buscar os dados e atualizar a View
+                controller.updateView(selectedYear);
+                System.out.println("Ação: Trocando relatório para o ano selecionado: " + selectedYear);
+            } else if (controller == null) {
+                System.out.println("Ação: Controller não está associado à View.");
+            }
         });
 
-        // Botão Exportar PDF (USA A CLASSE CSS PARA O HOVER)
+        // Botão Exportar PDF
         Button exportButton = new Button("📈 Exportar PDF");
         exportButton.getStyleClass().add("export-button"); 
 
-        // AÇÃO: Clique no botão Exportar PDF
         exportButton.setOnAction(event -> {
             System.out.println("Ação: Exportando relatório para PDF...");
         });
 
-        header.getChildren().addAll(titleBox, spacer, yearSelector, exportButton);
+        header.getChildren().addAll(titleBox, spacer, cmbYearSelector, exportButton); 
         return header;
     }
 
@@ -72,14 +104,17 @@ public class ReportsView {
     private Node createSummaryCards() {
         HBox summaryBox = new HBox(24);
         
-        // ATUALIZADO: Adicionando a seta ↗ nos textos de variação
         VBox totalReservas = createMetricCard("Total de Reservas", "64", "↗ +15% vs período anterior", "📅");
+        // Obtém o Label de valor para que ele possa ser atualizado (estrutura: VBox > VBox > Label)
+        lblTotalReservasValue = (Label) ((VBox) totalReservas.getChildren().get(1)).getChildren().get(0); 
         HBox.setHgrow(totalReservas, Priority.ALWAYS);
 
         VBox receitaTotal = createMetricCard("Receita Total", "R$ 519.200", "↗ +18% vs período anterior", "$");
+        lblReceitaTotalValue = (Label) ((VBox) receitaTotal.getChildren().get(1)).getChildren().get(0); 
         HBox.setHgrow(receitaTotal, Priority.ALWAYS);
         
         VBox novosClientes = createMetricCard("Novos Clientes", "28", "↗ +22% vs período anterior", "👥");
+        lblNovosClientesValue = (Label) ((VBox) novosClientes.getChildren().get(1)).getChildren().get(0); 
         HBox.setHgrow(novosClientes, Priority.ALWAYS);
 
         summaryBox.getChildren().addAll(totalReservas, receitaTotal, novosClientes);
@@ -105,18 +140,20 @@ public class ReportsView {
         HBox.setHgrow(innerSpacer, Priority.ALWAYS);
         labelAndIcon.getChildren().addAll(lblLabel, innerSpacer, lblIcon);
         
+        // Container do valor para permitir acesso e atualização
+        VBox valueContainer = new VBox();
         Label lblValue = new Label(value);
         lblValue.getStyleClass().add("stat-card-value"); 
+        valueContainer.getChildren().add(lblValue); 
         
         Label lblVariation = new Label(variation);
         lblVariation.getStyleClass().add("stat-card-description");
-        // A cor verde #388e3c é usada para a variação, incluindo a seta
         lblVariation.setTextFill(Color.web("#388e3c")); 
 
         Region middleSpacer = new Region();
         VBox.setVgrow(middleSpacer, Priority.ALWAYS);
 
-        box.getChildren().addAll(labelAndIcon, lblValue, middleSpacer, lblVariation);
+        box.getChildren().addAll(labelAndIcon, valueContainer, middleSpacer, lblVariation); 
         
         box.setOnMouseClicked(event -> {
             System.out.println("Ação: Card de métrica '" + label + "' clicado. Mostrar dashboard/drill-down.");
@@ -129,7 +166,6 @@ public class ReportsView {
     private Node createDetailsSection() {
         VBox detailsContainer = new VBox(24);
         
-        // Linha 1: Pacotes e Clientes 
         HBox topDetailsRow = new HBox(24);
         topDetailsRow.getStyleClass().add("info-grid");
         
@@ -141,7 +177,6 @@ public class ReportsView {
         
         topDetailsRow.getChildren().addAll(popularPackages, frequentClients);
         
-        // Linha 2: Desempenho Mensal 
         HBox bottomDetailsRow = new HBox(24);
         VBox monthlyPerformance = createMonthlyPerformanceCard();
         HBox.setHgrow(monthlyPerformance, Priority.ALWAYS);
@@ -200,7 +235,6 @@ public class ReportsView {
         Label lblRevenue = new Label(revenue);
         lblRevenue.getStyleClass().add("list-item-revenue");
         
-        // Aplicação da cor verde a TODOS os valores de receita
         lblRevenue.setStyle("-fx-text-fill: #388e3c; -fx-font-weight: bold;"); 
         
         
@@ -299,7 +333,6 @@ public class ReportsView {
         
         VBox performanceList = new VBox(0); 
         
-        // Dados mensais: Janeiro, Fevereiro e Março (COMPLETO)
         performanceList.getChildren().add(createMonthlyItem("Janeiro", "18 reservas", "R$ 145.200")); 
         performanceList.getChildren().add(createMonthlyItem("Fevereiro", "22 reservas", "R$ 178.400")); 
         performanceList.getChildren().add(createMonthlyItem("Março", "24 reservas", "R$ 195.600"));
@@ -340,5 +373,31 @@ public class ReportsView {
         });
 
         return item;
+    }
+    
+    // MÉTODOS MVC
+    
+    /**
+     * Associa o Controller à View. Chamado pelo ReportsController no construtor.
+     */
+    public void setController(ReportsController controller) {
+        this.controller = controller;
+        System.out.println("✅ ReportsView: Controller associado.");
+    }
+    
+    /**
+     * Atualiza os cards de resumo com os novos dados fornecidos pelo Controller.
+     */
+    public void updateSummary(ReportData data) {
+        if (lblTotalReservasValue != null) lblTotalReservasValue.setText(data.totalReservas);
+        if (lblReceitaTotalValue != null) lblReceitaTotalValue.setText(data.receitaTotal);
+        if (lblNovosClientesValue != null) lblNovosClientesValue.setText(data.novosClientes);
+        
+        // Atualiza o ComboBox para refletir o ano atual (garante que o valor selecionado mude)
+        if (cmbYearSelector != null) {
+            cmbYearSelector.setValue(data.year); 
+        }
+        
+        System.out.println("✅ ReportsView: Dados de resumo atualizados para o ano: " + data.year);
     }
 }
