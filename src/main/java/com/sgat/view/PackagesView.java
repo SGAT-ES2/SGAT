@@ -1,7 +1,6 @@
 package com.sgat.view;
 
 import com.sgat.model.Package;
-import javafx.stage.Stage;
 import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
@@ -11,7 +10,9 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
-import javafx.scene.shape.SVGPath;
+import javafx.stage.Stage;
+import org.kordamp.ikonli.javafx.FontIcon;
+import org.kordamp.ikonli.materialdesign2.*;
 
 import java.text.NumberFormat;
 import java.time.LocalDate;
@@ -69,8 +70,7 @@ public class PackagesView {
 
         Button newPackageButton = new Button("Novo Pacote");
         newPackageButton.getStyleClass().add("add-button");
-        SVGPath plusIcon = new SVGPath();
-        plusIcon.setContent("M12 5v14m-7-7h14");
+        FontIcon plusIcon = new FontIcon(MaterialDesignP.PLUS);
         newPackageButton.setGraphic(plusIcon);
         newPackageButton.setOnAction(e -> handleAddPackage());
 
@@ -104,9 +104,9 @@ public class PackagesView {
 
         HBox destinationBox = new HBox(4);
         destinationBox.setAlignment(Pos.CENTER_LEFT);
-        SVGPath pinIcon = new SVGPath();
-        pinIcon.setContent("M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z");
+        FontIcon pinIcon = new FontIcon(MaterialDesignM.MAP_MARKER);
         pinIcon.getStyleClass().add("package-card-icon");
+        pinIcon.setIconSize(20);
         Label destinationLabel = new Label();
         destinationLabel.textProperty().bind(pkg.destinationProperty());
         destinationLabel.getStyleClass().add("package-card-subtitle");
@@ -116,15 +116,15 @@ public class PackagesView {
         HBox controlsBox = new HBox(8);
         Button editButton = new Button();
         editButton.getStyleClass().add("icon-button");
-        SVGPath editIcon = new SVGPath();
-        editIcon.setContent("M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z");
+        FontIcon editIcon = new FontIcon(MaterialDesignP.PENCIL);
+        editIcon.setIconSize(20);
         editButton.setGraphic(editIcon);
         editButton.setOnAction(e -> handleEditPackage(pkg));
 
         Button deleteButton = new Button();
         deleteButton.getStyleClass().addAll("icon-button", "delete-button");
-        SVGPath deleteIcon = new SVGPath();
-        deleteIcon.setContent("M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2");
+        FontIcon deleteIcon = new FontIcon(MaterialDesignD.DELETE);
+        deleteIcon.setIconSize(20);
         deleteButton.setGraphic(deleteIcon);
         deleteButton.setOnAction(e -> handleDeletePackage(pkg));
         controlsBox.getChildren().addAll(editButton, deleteButton);
@@ -146,9 +146,9 @@ public class PackagesView {
         footer.setAlignment(Pos.CENTER_LEFT);
         HBox durationBox = new HBox(4);
         durationBox.setAlignment(Pos.CENTER_LEFT);
-        SVGPath calendarIcon = new SVGPath();
-        calendarIcon.setContent("M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2z");
+        FontIcon calendarIcon = new FontIcon(MaterialDesignC.CALENDAR);
         calendarIcon.getStyleClass().add("package-card-icon");
+        calendarIcon.setIconSize(18);
         Label durationLabel = new Label();
         durationLabel.textProperty().bind(pkg.durationProperty());
         durationBox.getChildren().addAll(calendarIcon, durationLabel);
@@ -158,9 +158,9 @@ public class PackagesView {
 
         HBox priceBox = new HBox(4);
         priceBox.setAlignment(Pos.CENTER_LEFT);
-        SVGPath dollarIcon = new SVGPath();
-        dollarIcon.setContent("M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6");
+        FontIcon dollarIcon = new FontIcon(MaterialDesignC.CASH);
         dollarIcon.getStyleClass().add("package-card-icon");
+        dollarIcon.setIconSize(20);
         Label priceLabel = new Label();
         priceLabel.textProperty().bind(Bindings.createStringBinding(() -> currencyFormat.format(pkg.getPrice()), pkg.priceProperty()));
         priceLabel.getStyleClass().add("price-label");

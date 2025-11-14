@@ -3,6 +3,7 @@ package com.sgat.view;
 import java.util.HashMap;
 import java.util.Map;
 
+import javafx.scene.Scene;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.materialdesign2.MaterialDesignA;
 import org.kordamp.ikonli.materialdesign2.MaterialDesignC;
@@ -228,7 +229,15 @@ public class MainLayout {
         HBox content = new HBox(12, icon, label);
         content.setAlignment(Pos.CENTER_LEFT);
         logoutButton.setGraphic(content);
-        logoutButton.setOnAction(e -> Platform.exit());
+        logoutButton.setOnAction(e -> {
+            LoginView loginView = new LoginView();
+            Parent loginRoot = loginView.getView();
+            Scene scene = stage.getScene();
+            scene.setRoot(loginRoot);
+            stage.setFullScreen(true);
+            stage.sizeToScene();
+            stage.centerOnScreen();
+        });
 
         footer.getChildren().add(logoutButton);
         return footer;

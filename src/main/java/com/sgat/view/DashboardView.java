@@ -5,7 +5,8 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.layout.*;
-import javafx.scene.shape.SVGPath;
+import org.kordamp.ikonli.javafx.FontIcon;
+import org.kordamp.ikonli.materialdesign2.*;
 
 public class DashboardView {
 
@@ -34,10 +35,10 @@ public class DashboardView {
             statsGrid.getColumnConstraints().add(col);
         }
 
-        Node statCard1 = createStatCard("Pacotes Ativos", "78", "+5.2% vs. mês passado", "M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z");
-        Node statCard2 = createStatCard("Clientes Cadastrados", "1,204", "+120 novos este mês", "M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2");
-        Node statCard3 = createStatCard("Reservas Pendentes", "32", "-10% vs. semana passada", "M8 22h8M12 16.5A2.5 2.5 0 0 1 9.5 14h5a2.5 2.5 0 0 1-2.5 2.5Z");
-        Node statCard4 = createStatCard("Receita (Mês)", "R$ 45.8k", "+15% vs. mês passado", "M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6");
+        Node statCard1 = createStatCard("Pacotes Ativos", "78", "+5.2% vs. mês passado", new FontIcon(MaterialDesignP.PACKAGE_VARIANT_CLOSED));
+        Node statCard2 = createStatCard("Clientes Cadastrados", "1,204", "+120 novos este mês", new FontIcon(MaterialDesignA.ACCOUNT_GROUP_OUTLINE));
+        Node statCard3 = createStatCard("Reservas Pendentes", "32", "-10% vs. semana passada", new FontIcon(MaterialDesignC.CALENDAR_CLOCK));
+        Node statCard4 = createStatCard("Receita (Mês)", "R$ 45.8k", "+15% vs. mês passado", new FontIcon(MaterialDesignC.CASH));
 
         statsGrid.add(statCard1, 0, 0);
         statsGrid.add(statCard2, 1, 0);
@@ -67,7 +68,7 @@ public class DashboardView {
         return dashboardPane;
     }
 
-    private Node createStatCard(String title, String value, String description, String iconSvgPath) {
+    private Node createStatCard(String title, String value, String description, Node icon) {
         VBox card = new VBox();
         card.getStyleClass().add("stat-card");
         GridPane.setHgrow(card, Priority.ALWAYS); // Permite que o card cresça horizontalmente
@@ -78,9 +79,10 @@ public class DashboardView {
         titleLabel.getStyleClass().add("stat-card-title");
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
-        SVGPath icon = new SVGPath();
-        icon.setContent(iconSvgPath);
         icon.getStyleClass().add("icon-svg");
+        if (icon instanceof FontIcon) {
+            ((FontIcon) icon).setIconSize(24);
+        }
         header.getChildren().addAll(titleLabel, spacer, icon);
 
         Label valueLabel = new Label(value);
@@ -151,28 +153,26 @@ public class DashboardView {
 
         VBox list = new VBox();
         list.getChildren().addAll(
-            createPackageItem("Tour pela Europa Imperial", 42, "R$ 120.5k", "M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"),
-            createPackageItem("Aventura na Patagônia", 35, "R$ 95.2k", "M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"),
-            createPackageItem("Férias em Cancún", 28, "R$ 88.9k", "M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z")
+            createPackageItem("Tour pela Europa Imperial", 42, "R$ 120.5k", new FontIcon(MaterialDesignM.MAP_MARKER)),
+            createPackageItem("Aventura na Patagônia", 35, "R$ 95.2k", new FontIcon(MaterialDesignM.MAP_MARKER)),
+            createPackageItem("Férias em Cancún", 28, "R$ 88.9k", new FontIcon(MaterialDesignM.MAP_MARKER))
         );
 
         card.getChildren().addAll(title, subtitle, list);
         return card;
     }
 
-    private Node createPackageItem(String name, int sales, String revenue, String svgPath) {
+    private Node createPackageItem(String name, int sales, String revenue, Node icon) {
         BorderPane item = new BorderPane();
         item.getStyleClass().add("list-item");
 
         HBox leftBox = new HBox(12);
         leftBox.setAlignment(Pos.CENTER_LEFT);
 
-        StackPane iconContainer = new StackPane();
-        iconContainer.getStyleClass().add("package-icon-container");
-        SVGPath icon = new SVGPath();
-        icon.setContent(svgPath);
         icon.getStyleClass().add("icon-svg");
-        iconContainer.getChildren().add(icon);
+        if (icon instanceof FontIcon) {
+            ((FontIcon) icon).setIconSize(20);
+        }
 
         VBox infoBox = new VBox(2);
         Label nameLabel = new Label(name);
@@ -181,7 +181,7 @@ public class DashboardView {
         salesLabel.getStyleClass().add("list-item-package-info");
         infoBox.getChildren().addAll(nameLabel, salesLabel);
 
-        leftBox.getChildren().addAll(iconContainer, infoBox);
+        leftBox.getChildren().addAll(icon, infoBox);
 
         Label revenueLabel = new Label(revenue);
         revenueLabel.getStyleClass().add("list-item-revenue");
