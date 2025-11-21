@@ -1,19 +1,18 @@
 package com.sgat.view;
 
-import java.util.HashMap; 
+import com.sgat.controller.ScreenController;
+import java.util.HashMap;
 import java.util.Map;
 
-import javafx.scene.Scene;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.materialdesign2.*;
 
 import com.sgat.controller.PaymentsController;
-import com.sgat.controller.ReportsController; 
+import com.sgat.controller.ReportsController;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
-import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -23,7 +22,7 @@ import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.control.ToggleButton; 
+import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
@@ -38,26 +37,28 @@ public class MainLayout {
 
     private final BorderPane mainLayout;
     private final Stage stage;
+    private final ScreenController screenController;
     private final BooleanProperty sidebarCollapsed = new SimpleBooleanProperty(false);
-    private VBox sidebar; 
+    private VBox sidebar;
     private final StackPane contentStack;
     private final Map<String, Node> views = new HashMap<>();
     private final ToggleGroup toggleGroup = new ToggleGroup();
     private final int ICON_SIZE = 20;
 
-    public MainLayout(Stage stage) {
+    public MainLayout(Stage stage, ScreenController screenController) {
         this.stage = stage;
+        this.screenController = screenController;
         mainLayout = new BorderPane();
         contentStack = new StackPane();
 
         // --- INICIALIZAÇÃO DAS VIEWS (MVC) ---
         PaymentsView paymentsView = new PaymentsView();
         PaymentsController paymentsController = new PaymentsController(paymentsView);
-        paymentsView.setController(paymentsController); 
-        views.put("Pagamentos", paymentsView.getView()); 
+        paymentsView.setController(paymentsController);
+        views.put("Pagamentos", paymentsView.getView());
 
         ReportsView reportsView = new ReportsView();
-        new ReportsController(reportsView); 
+        new ReportsController(reportsView);
         views.put("Relatórios", reportsView.getView());
 
         views.put("Dashboard", new DashboardView().getView());
@@ -177,7 +178,7 @@ public class MainLayout {
         label.visibleProperty().bind(sidebarCollapsed.not());
         label.managedProperty().bind(sidebarCollapsed.not());
 
-        HBox content = new HBox(12, iconNode, label); 
+        HBox content = new HBox(12, iconNode, label);
         content.setAlignment(Pos.CENTER_LEFT);
         button.setGraphic(content);
         button.setAlignment(Pos.CENTER_LEFT);
@@ -207,13 +208,7 @@ public class MainLayout {
         content.setAlignment(Pos.CENTER_LEFT);
         logoutButton.setGraphic(content);
         logoutButton.setOnAction(e -> {
-            LoginView loginView = new LoginView();
-            Parent loginRoot = loginView.getView();
-            Scene scene = stage.getScene();
-            scene.setRoot(loginRoot);
-            stage.setFullScreen(true);
-            stage.sizeToScene();
-            stage.centerOnScreen();
+            screenController.showLoginScreen();
         });
 
         footer.getChildren().add(logoutButton);
