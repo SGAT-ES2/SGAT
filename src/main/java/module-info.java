@@ -1,15 +1,24 @@
 module com.sgat {
-    // Declara que nosso módulo precisa dos módulos de controls e fxml do JavaFX
+    // JavaFX
     requires javafx.controls;
     requires javafx.fxml;
 
-    // Declara que nosso módulo precisa do módulo de SQL do Java (para o JDBC)
+    // JDBC
     requires java.sql;
+
+    // Ícones
     requires org.kordamp.ikonli.javafx;
     requires org.kordamp.ikonli.materialdesign2;
 
+    // PDFBox (já estava faltando isso)
+    requires org.apache.pdfbox;
 
-    // Abre nosso pacote para a biblioteca do JavaFX, permitindo que ela acesse nosso código
+    // Permite abrir arquivos (Desktop.getDesktop())
+    requires java.desktop;
+
+    // Abre controllers para o JavaFX
     opens com.sgat.controller to javafx.fxml;
+
+    // Exporta o módulo principal
     exports com.sgat;
 }
