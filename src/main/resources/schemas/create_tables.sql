@@ -30,3 +30,24 @@ CREATE TABLE reserva (
     valor_total NUMERIC(10, 2) NOT NULL,
     status VARCHAR(50) NOT NULL
 );
+
+CREATE TABLE pagamento (
+    id SERIAL PRIMARY KEY,
+    reserva_id INTEGER REFERENCES reserva(id),
+    data_pagamento DATE NOT NULL,
+    valor_pago NUMERIC(10, 2) NOT NULL,
+    metodo_pagamento VARCHAR(50) NOT NULL,
+    status VARCHAR(50) NOT NULL,
+    notas TEXT
+);
+
+CREATE TABLE itinerario_detalhado (
+    id SERIAL PRIMARY KEY,
+    reserva_id INTEGER REFERENCES reserva(id),
+    data DATE NOT NULL,
+    horario TIME NOT NULL,
+    titulo VARCHAR(255) NOT NULL,
+    descricao TEXT,
+    icone VARCHAR(100),
+    tipo VARCHAR(50)
+);

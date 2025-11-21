@@ -1,76 +1,77 @@
 package com.sgat.view;
 
-import com.sgat.model.Activity;
-import com.sgat.model.Day;
-import com.sgat.model.Itinerary;
-import javafx.stage.Stage;
+import com.sgat.model.*;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
+import javafx.stage.Stage;
+import javafx.util.StringConverter;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.materialdesign2.*;
 
 import java.time.LocalDate;
-import java.util.Optional;
+import java.time.LocalTime;
+import java.util.List;
 
 public class ItinerariesView {
 
     private final Stage stage;
     private final VBox view;
-    private final ObservableList<Itinerary> itineraries = FXCollections.observableArrayList();
+    private final ItineraryDAO itineraryDAO;
+    private final ReservationDAO reservationDAO;
+    private ComboBox<Reservation> reservationComboBox;
+    private VBox itineraryContainer;
     private static final int ICON_SIZE = 20;
 
     public ItinerariesView(Stage stage) {
         this.stage = stage;
+        this.itineraryDAO = new ItineraryDAO();
+        this.reservationDAO = new ReservationDAO();
+
         view = new VBox(24);
         view.setPadding(new Insets(24));
         view.getStyleClass().add("page");
 
-        setupData();
-
         Node header = createHeader();
-        Node itineraryCard = createItineraryCard(itineraries.get(0)); // Display the first itinerary by default
+        itineraryContainer = new VBox(20);
+        VBox.setVgrow(itineraryContainer, Priority.ALWAYS);
 
-        view.getChildren().addAll(header, itineraryCard);
-        VBox.setVgrow(itineraryCard, Priority.ALWAYS);
+        view.getChildren().addAll(header, itineraryContainer);
+        
+        loadReservations();
     }
 
     public Node getView() {
         return view;
     }
 
-    private void setupData() {
-        Itinerary itinerary = new Itinerary("RES-001", "Maria Silva", "Paris Romântica", LocalDate.of(2024, 10, 20), LocalDate.of(2024, 10, 25));
-
-        Day day1 = new Day(1, "Chegada em Paris");
-        day1.getActivities().addAll(
-                new Activity("14:00", "Check-in no Hotel", "Chegada e check-in no Hotel Le Bristol.", MaterialDesignH.HOME),
-                new Activity("16:00", "Passeio pelo Rio Sena", "Cruzeiro panorâmico pelo Rio Sena para uma primeira vista da cidade.", MaterialDesignF.FERRY),
-                new Activity("20:00", "Jantar no Le Jules Verne", "Jantar no restaurante da Torre Eiffel.", MaterialDesignS.SILVERWARE_FORK_KNIFE)
-        );
-
-        Day day2 = new Day(2, "Cultura e Arte");
-        day2.getActivities().addAll(
-                new Activity("09:00", "Museu do Louvre", "Visita guiada aos principais destaques do museu.", MaterialDesignB.BANK),
-                new Activity("13:00", "Almoço no Café Marly", "Almoço com vista para a pirâmide do Louvre.", MaterialDesignS.SILVERWARE_FORK_KNIFE),
-                new Activity("15:00", "Catedral de Notre-Dame", "Visita à área externa e arredores da catedral.", MaterialDesignC.CHURCH)
-        );
-        
-        Day day3 = new Day(3, "Retorno");
-        day3.getActivities().addAll(
-                new Activity("11:00", "Check-out do Hotel", "Check-out e transfer para o aeroporto.", MaterialDesignH.HOME_EXPORT_OUTLINE)
-        );
-
-        itinerary.getDays().addAll(day1, day2, day3);
-        itineraries.add(itinerary);
+    private void loadReservations() {
+        List<Reservation> reservations = reservationDAO.getAllReservations();
+        reservationComboBox.setItems(FXCollections.observableArrayList(reservations));
+        if (!reservations.isEmpty()) {
+            reservationComboBox.setValue(reservations.get(0));
+        }
+    }
+    
+    private void loadItinerary(Reservation reservation) {
+        itineraryContainer.getChildren().clear();
+        if (reservation != null) {
+            Itinerary itinerary = itineraryDAO.getItineraryForReservation(reservation.getId());
+            if (itinerary != null && !itinerary.getDays().isEmpty()) {
+                itineraryContainer.getChildren().add(createItineraryCard(itinerary));
+            } else {
+                Label noItineraryLabel = new Label("Nenhum itinerário detalhado para esta reserva.");
+                noItineraryLabel.getStyleClass().add("page-subtitle");
+                itineraryContainer.getChildren().add(noItineraryLabel);
+            }
+        }
     }
 
     private Node createHeader() {
-        HBox header = new HBox();
+        HBox header = new HBox(16);
         header.setAlignment(Pos.CENTER_LEFT);
 
         VBox titleBox = new VBox(-2);
@@ -82,15 +83,39 @@ public class ItinerariesView {
 
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
+        
+        reservationComboBox = new ComboBox<>();
+        reservationComboBox.setPromptText("Selecione uma reserva");
+        reservationComboBox.setConverter(new StringConverter<>() {
+            @Override
+            public String toString(Reservation reservation) {
+                return reservation == null ? "" : "RES-" + reservation.getId() + " - " + reservation.getClient().getName();
+            }
 
-        Button generateButton = new Button("Gerar Itinerário");
-        generateButton.getStyleClass().add("add-button");
+            @Override
+            public Reservation fromString(String string) {
+                return null;
+            }
+        });
+        reservationComboBox.valueProperty().addListener((obs, oldVal, newVal) -> loadItinerary(newVal));
+
+        Button addActivityButton = new Button("Adicionar Atividade");
+        addActivityButton.getStyleClass().add("add-button");
         FontIcon plusIcon = new FontIcon(MaterialDesignP.PLUS);
         plusIcon.setIconSize(ICON_SIZE);
-        generateButton.setGraphic(plusIcon);
-        generateButton.setOnAction(e -> showGenerateItineraryDialog());
+        addActivityButton.setGraphic(plusIcon);
+        addActivityButton.setOnAction(e -> {
+            Reservation selectedReservation = reservationComboBox.getValue();
+            if (selectedReservation != null) {
+                showAddActivityDialog(selectedReservation);
+            } else {
+                Alert alert = new Alert(Alert.AlertType.WARNING, "Por favor, selecione uma reserva primeiro.");
+                alert.initOwner(stage);
+                alert.showAndWait();
+            }
+        });
 
-        header.getChildren().addAll(titleBox, spacer, generateButton);
+        header.getChildren().addAll(titleBox, spacer, reservationComboBox, addActivityButton);
         return header;
     }
 
@@ -104,9 +129,12 @@ public class ItinerariesView {
         cardHeader.setAlignment(Pos.CENTER_LEFT);
         FontIcon mapIcon = new FontIcon(MaterialDesignM.MAP_MARKER);
         mapIcon.setIconSize(ICON_SIZE);
+        
+        Reservation reservation = itinerary.getReservation();
+        
         cardHeader.getChildren().addAll(
                 mapIcon,
-                new Label(String.format("%s - %s - %s", itinerary.getReservationId(), itinerary.getClientName(), itinerary.getPackageName()))
+                new Label(String.format("RES-%d - %s - %s", reservation.getId(), reservation.getClient().getName(), reservation.getTravelPackage().getNomePacote()))
         );
         cardHeader.getStyleClass().add("info-card-title");
 
@@ -141,7 +169,7 @@ public class ItinerariesView {
         dayTitleBox.getStyleClass().add("day-title");
 
         VBox timeline = new VBox();
-        ObservableList<Activity> activities = day.getActivities();
+        List<Activity> activities = day.getActivities();
         for (int i = 0; i < activities.size(); i++) {
             timeline.getChildren().add(createActivityRow(activities.get(i), i == activities.size() - 1));
         }
@@ -159,7 +187,6 @@ public class ItinerariesView {
     private Node createActivityRow(Activity activity, boolean isLast) {
         HBox activityRow = new HBox(16);
 
-        // Icon Column
         VBox iconColumn = new VBox();
         iconColumn.setAlignment(Pos.TOP_CENTER);
         iconColumn.setSpacing(8);
@@ -179,7 +206,6 @@ public class ItinerariesView {
             iconColumn.getChildren().add(line);
         }
 
-        // Content Column
         VBox contentColumn = new VBox(4);
 
         HBox timeBox = new HBox(8);
@@ -203,11 +229,11 @@ public class ItinerariesView {
         return activityRow;
     }
 
-    private void showGenerateItineraryDialog() {
+    private void showAddActivityDialog(Reservation reservation) {
         Dialog<ButtonType> dialog = new Dialog<>();
         dialog.initOwner(this.stage);
-        dialog.setTitle("Gerar Novo Itinerário");
-        dialog.setHeaderText("Preencha as informações para gerar um novo itinerário.");
+        dialog.setTitle("Adicionar Atividade ao Itinerário");
+        dialog.setHeaderText("Preencha as informações da nova atividade para a reserva RES-" + reservation.getId());
 
         dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
 
@@ -216,38 +242,46 @@ public class ItinerariesView {
         grid.setVgap(10);
         grid.setPadding(new Insets(20, 150, 10, 10));
 
-        ComboBox<String> reservationCombo = new ComboBox<>();
-        reservationCombo.setItems(FXCollections.observableArrayList("RES-001 - Maria Silva", "RES-002 - João Santos"));
-        DatePicker startDatePicker = new DatePicker(LocalDate.now());
-        DatePicker endDatePicker = new DatePicker(LocalDate.now().plusDays(5));
-        TextArea flightsArea = new TextArea();
-        TextArea accommodationArea = new TextArea();
-        TextArea activitiesArea = new TextArea();
+        DatePicker datePicker = new DatePicker(LocalDate.now());
+        TextField timeField = new TextField();
+        timeField.setPromptText("HH:MM");
+        TextField titleField = new TextField();
+        TextArea descriptionArea = new TextArea();
+        ComboBox<String> typeComboBox = new ComboBox<>();
+        typeComboBox.setItems(FXCollections.observableArrayList("Flight", "Accommodation", "Tour", "Other"));
+        typeComboBox.setValue("Other");
 
-        grid.add(new Label("Reserva:"), 0, 0);
-        grid.add(reservationCombo, 1, 0);
-        grid.add(new Label("Data de Início:"), 0, 1);
-        grid.add(startDatePicker, 1, 1);
-        grid.add(new Label("Data de Término:"), 0, 2);
-        grid.add(endDatePicker, 1, 2);
-        grid.add(new Label("Voos:"), 0, 3);
-        grid.add(flightsArea, 1, 3);
-        grid.add(new Label("Acomodações:"), 0, 4);
-        grid.add(accommodationArea, 1, 4);
-        grid.add(new Label("Atividades:"), 0, 5);
-        grid.add(activitiesArea, 1, 5);
+        grid.add(new Label("Data:"), 0, 0);
+        grid.add(datePicker, 1, 0);
+        grid.add(new Label("Horário:"), 0, 1);
+        grid.add(timeField, 1, 1);
+        grid.add(new Label("Tipo:"), 0, 2);
+        grid.add(typeComboBox, 1, 2);
+        grid.add(new Label("Título:"), 0, 3);
+        grid.add(titleField, 1, 3);
+        grid.add(new Label("Descrição:"), 0, 4);
+        grid.add(descriptionArea, 1, 4);
 
         dialog.getDialogPane().setContent(grid);
 
         dialog.setResultConverter(dialogButton -> {
             if (dialogButton == ButtonType.OK) {
-                // Here you would normally create a new Itinerary object
-                // For this example, we just print the values
-                System.out.println("Gerando Itinerário:");
-                System.out.println("Reserva: " + reservationCombo.getValue());
-                System.out.println("Data de Início: " + startDatePicker.getValue());
-                System.out.println("Data de Término: " + endDatePicker.getValue());
-                // In a real app, you would process this data
+                try {
+                    LocalTime time = LocalTime.parse(timeField.getText());
+                    itineraryDAO.addActivityToItinerary(
+                            reservation.getId(),
+                            datePicker.getValue(),
+                            time,
+                            titleField.getText(),
+                            descriptionArea.getText(),
+                            typeComboBox.getValue()
+                    );
+                    loadItinerary(reservation);
+                } catch (Exception e) {
+                    Alert alert = new Alert(Alert.AlertType.ERROR, "Formato de hora inválido. Use HH:MM.");
+                    alert.initOwner(stage);
+                    alert.showAndWait();
+                }
                 return dialogButton;
             }
             return null;

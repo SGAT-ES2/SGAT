@@ -11,12 +11,14 @@ public class Activity {
     private final StringProperty title;
     private final StringProperty description;
     private final ObjectProperty<Ikon> icon;
+    private final StringProperty type;
 
-    public Activity(String time, String title, String description, Ikon icon) {
+    public Activity(String time, String title, String description, Ikon icon, String type) {
         this.time = new SimpleStringProperty(time);
         this.title = new SimpleStringProperty(title);
         this.description = new SimpleStringProperty(description);
         this.icon = new SimpleObjectProperty<>(icon);
+        this.type = new SimpleStringProperty(type);
     }
 
     // Getters and Property Getters
@@ -50,5 +52,13 @@ public class Activity {
 
     public ObjectProperty<Ikon> iconProperty() {
         return icon;
+    }
+    
+    public String getType() {
+        return type.get();
+    }
+
+    public StringProperty typeProperty() {
+        return type;
     }
 }

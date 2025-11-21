@@ -3,47 +3,84 @@ package com.sgat.model;
 import java.time.LocalDate;
 
 public class Pagamento {
-    
-    private int id;
-    private String reserva; // O texto formatado para exibição (ex: "RES-001\nMaria Silva")
-    private double valor;
-    private String metodo;
-    private LocalDate data;
-    private String observacoes;
-    private int clienteId; 
-    
-    // Construtor original
-    public Pagamento(int id, String reserva, double valor, String metodo, LocalDate data, String observacoes) {
-        this(id, reserva, valor, metodo, data, observacoes, 0); // Chama o novo construtor
-    }
 
-    // NOVO Construtor que aceita o ID do Cliente/Reserva
-    public Pagamento(int id, String reserva, double valor, String metodo, LocalDate data, String observacoes, int clienteId) {
+    private int id;
+    private Reservation reserva;
+    private LocalDate dataPagamento;
+    private double valorPago;
+    private String metodoPagamento;
+    private String status;
+    private String notas;
+
+    // Constructors
+    public Pagamento(int id, Reservation reserva, LocalDate dataPagamento, double valorPago, String metodoPagamento, String status, String notas) {
         this.id = id;
         this.reserva = reserva;
-        this.valor = valor;
-        this.metodo = metodo;
-        this.data = data;
-        this.observacoes = observacoes;
-        this.clienteId = clienteId;
+        this.dataPagamento = dataPagamento;
+        this.valorPago = valorPago;
+        this.metodoPagamento = metodoPagamento;
+        this.status = status;
+        this.notas = notas;
     }
     
-    // Getters e Setters
-    public int getClienteId() {
-        return clienteId;
+    public Pagamento(Reservation reserva, LocalDate dataPagamento, double valorPago, String metodoPagamento, String status, String notas) {
+        this(0, reserva, dataPagamento, valorPago, metodoPagamento, status, notas);
     }
-    public int getId() { return id; }
-    public String getReserva() { return reserva; }
-    public double getValor() { return valor; }
-    public String getMetodo() { return metodo; }
-    public LocalDate getData() { return data; }
-    public String getObservacoes() { return observacoes; }
-    
-    public void setId(int id) { this.id = id; }
-    public void setReserva(String reserva) { this.reserva = reserva; }
-    public void setValor(double valor) { this.valor = valor; }
-    public void setMetodo(String metodo) { this.metodo = metodo; }
-    public void setData(LocalDate data) { this.data = data; }
-    public void setObservacoes(String observacoes) { this.observacoes = observacoes; }
-    public void setClienteId(int clienteId) { this.clienteId = clienteId; }
+
+    // Getters and Setters
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public Reservation getReserva() {
+        return reserva;
+    }
+
+    public void setReserva(Reservation reserva) {
+        this.reserva = reserva;
+    }
+
+    public LocalDate getDataPagamento() {
+        return dataPagamento;
+    }
+
+    public void setDataPagamento(LocalDate dataPagamento) {
+        this.dataPagamento = dataPagamento;
+    }
+
+    public double getValorPago() {
+        return valorPago;
+    }
+
+    public void setValorPago(double valorPago) {
+        this.valorPago = valorPago;
+    }
+
+    public String getMetodoPagamento() {
+        return metodoPagamento;
+    }
+
+    public void setMetodoPagamento(String metodoPagamento) {
+        this.metodoPagamento = metodoPagamento;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getNotas() {
+        return notas;
+    }
+
+    public void setNotas(String notas) {
+        this.notas = notas;
+    }
 }

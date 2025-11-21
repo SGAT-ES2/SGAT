@@ -1,28 +1,27 @@
 package com.sgat.view; 
 
-import java.text.NumberFormat;
-import java.util.Locale;
-
 import com.sgat.controller.PaymentsController;
-import com.sgat.model.Pagamento; 
-
-import javafx.collections.ObservableList;
+import com.sgat.model.Pagamento;
+import com.sgat.model.Reservation;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Node; 
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.layout.HBox; 
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
+import java.text.NumberFormat;
+import java.util.Locale;
+
 public class PaymentsView { 
 
     private final VBox view;
-    private PaymentsController controller;
+    private final PaymentsController controller;
     private VBox tableBody; 
 
     private Label receivedValueLabel; 
@@ -40,25 +39,20 @@ public class PaymentsView {
         view.setPadding(new Insets(24));
         view.getStyleClass().add("dashboard-pane");
 
+        this.controller = new PaymentsController(this);
+
         Node header = createHeader();
         Node summaryCards = createSummaryCards();
         Node historyCard = createHistoryCard();
 
         view.getChildren().addAll(header, summaryCards, historyCard);
-        VBox.setVgrow(historyCard, Priority.ALWAYS); 
+        VBox.setVgrow(historyCard, Priority.ALWAYS);
+        
+        refreshAll();
     }
 
     public Node getView() {
         return view;
-    }
-    
-    public void setController(PaymentsController controller) {
-        this.controller = controller;
-        refreshAll(); 
-    }
-    
-    public void setPaymentsList(ObservableList<Pagamento> list) {
-        refreshAll();
     }
     
     public void refreshAll() {
@@ -71,12 +65,12 @@ public class PaymentsView {
     private void updateSummaryCards() {
         if (controller == null || receivedValueLabel == null || pendingValueLabel == null) return;
         
-        double[] totais = controller.calcularTotaisDePagamento();
-        double totalPago = totais[0];
-        double totalPendente = totais[1];
+        double[] totals = controller.calculatePaymentTotals();
+        double totalPaid = totals[0];
+        double totalPending = totals[1];
         
-        receivedValueLabel.setText(formatCurrency(totalPago));
-        pendingValueLabel.setText(formatCurrency(totalPendente));
+        receivedValueLabel.setText(formatCurrency(totalPaid));
+        pendingValueLabel.setText(formatCurrency(totalPending));
     }
     
     private String formatCurrency(double value) {
@@ -93,23 +87,23 @@ public class PaymentsView {
         for (Pagamento p : controller.getPagamentos()) {
             
             double totalValue = controller.getReservationTotal(p.getReserva()); 
-            double pago = p.getValor();
-            double pendente = totalValue - pago;
+            double paid = p.getValorPago();
+            double pending = totalValue - paid;
             
-            String status = (pago >= totalValue && totalValue > 0) ? "Paga" : (pago > 0 ? "Parcial" : "Pendente");
+            String status = (paid >= totalValue && totalValue > 0) ? "Paga" : (paid > 0 ? "Parcial" : "Pendente");
             
             String totalFormatted = formatCurrency(totalValue);
-            String pagoFormatted = formatCurrency(pago);
-            String pendenteFormatted = formatCurrency(pendente);
+            String paidFormatted = formatCurrency(p.getValorPago());
+            String pendingFormatted = formatCurrency(pending);
             
             tableBody.getChildren().add(
                 createHistoryRow(
                     p.getReserva(),
                     totalFormatted, 
-                    pagoFormatted, 
-                    pendenteFormatted, 
-                    p.getMetodo(), 
-                    p.getData() != null ? p.getData().toString() : "-", 
+                    paidFormatted, 
+                    pendingFormatted, 
+                    p.getMetodoPagamento(), 
+                    p.getDataPagamento() != null ? p.getDataPagamento().toString() : "-", 
                     status
                 )
             );
@@ -133,21 +127,20 @@ public class PaymentsView {
 
         Button registerButton = new Button("+ Registrar Pagamento");
 
-        // 🔵 BOTÃO AZUL + TAMANHO MENOR (igual ao outro layout)
         registerButton.setStyle(
             "-fx-background-color: #2196F3;" +
             "-fx-text-fill: white;" +
             "-fx-font-weight: bold;" +
-            "-fx-padding: 6px 14px;" +      // tamanho reduzido
+            "-fx-padding: 6px 14px;" +
             "-fx-background-radius: 6px;" +
             "-fx-cursor: hand;" +
-            "-fx-font-size: 12px;"          // fonte menor
+            "-fx-font-size: 12px;"
         );
         
         registerButton.setOnAction(event -> {
             Stage ownerStage = (Stage) registerButton.getScene().getWindow();
             if (controller != null) {
-                controller.abrirDialogPagamento(ownerStage);
+                controller.openPaymentDialog(ownerStage);
             }
         });
 
@@ -261,13 +254,6 @@ public class PaymentsView {
         return header;
     }
     
-    private Node createSpacer(double width) {
-        Region spacer = new Region();
-        spacer.setMinWidth(width);
-        spacer.setPrefWidth(width);
-        return spacer;
-    }
-    
     private Label createHeaderLabel(String text, double width, Pos alignment) {
         Label label = new Label(text);
         label.getStyleClass().add("column-header"); 
@@ -278,18 +264,17 @@ public class PaymentsView {
         return label;
     }
 
-    private Node createHistoryRow(String reservation, String total, String paid, String pending, String method, String date, String status) {
+    private Node createHistoryRow(Reservation reservation, String total, String paid, String pending, String method, String date, String status) {
         HBox row = new HBox(COLUMN_GAP); 
         row.getStyleClass().add("list-item"); 
         row.setPadding(new Insets(12, 16, 12, 16));
         row.getStyleClass().add("clickable-list-item"); 
 
         VBox resBox = new VBox(-2);
-        String[] parts = reservation.split("\n");
-        Label lblRes = new Label(parts[0]);
+        Label lblRes = new Label("RES-" + reservation.getId());
         lblRes.getStyleClass().add("list-item-package-name");
         
-        String clientName = (parts.length > 1) ? parts[1].trim() : "";
+        String clientName = reservation.getClient().getName();
         Label lblClient = new Label(clientName);
         lblClient.getStyleClass().add("list-item-package-info");
         resBox.getChildren().addAll(lblRes, lblClient);
@@ -325,7 +310,7 @@ public class PaymentsView {
         row.getChildren().addAll(resBox, lblTotal, lblPaid, lblPending, lblMethod, lblDate, lblStatus);
 
         row.setOnMouseClicked(event -> {
-            System.out.println("Ação: Linha de pagamento clicada. Abrir detalhes da Reserva: " + reservation.split("\n")[0]);
+            System.out.println("Ação: Linha de pagamento clicada. Abrir detalhes da Reserva: " + reservation.getId());
         });
         
         return row;
