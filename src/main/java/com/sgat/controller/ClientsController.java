@@ -1,36 +1,37 @@
 package com.sgat.controller;
 
 import com.sgat.model.Client;
+import com.sgat.model.ClientDAO;
 import com.sgat.view.ClientsView;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class ClientsController {
 
     private final ClientsView view;
-    private final List<Client> clients;
+    private final ClientDAO clientDAO;
 
-    public ClientsController(ClientsView view, List<Client> clients) {
+    public ClientsController(ClientsView view) {
         this.view = view;
-        this.clients = clients;
+        this.clientDAO = new ClientDAO();
     }
 
     public void addClient(Client client) {
-        clients.add(client);
+        clientDAO.addClient(client);
     }
 
     public void updateClient(Client client) {
-        clients.removeIf(c -> c.equals(client));
-        clients.add(client);
+        clientDAO.updateClient(client);
     }
 
     public void deleteClient(Client client) {
-        clients.remove(client);
+        clientDAO.deleteClient(client);
     }
 
     public Client getClient(int id) {
-        for (Client client : clients) {
+        // This is inefficient, but for now it's fine.
+        // A better approach would be a getById in the DAO.
+        for (Client client : getAllClients()) {
             if (client.getId() == id) {
                 return client;
             }
@@ -39,6 +40,6 @@ public class ClientsController {
     }
 
     public List<Client> getAllClients() {
-        return clients;
+        return clientDAO.getAllClients();
     }
 }
