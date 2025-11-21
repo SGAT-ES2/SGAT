@@ -7,7 +7,6 @@ import java.util.Map;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.materialdesign2.*;
 
-import com.sgat.controller.PaymentsController;
 import com.sgat.controller.ReportsController;
 
 import javafx.animation.KeyFrame;
@@ -52,10 +51,7 @@ public class MainLayout {
         contentStack = new StackPane();
 
         // --- INICIALIZAÇÃO DAS VIEWS (MVC) ---
-        PaymentsView paymentsView = new PaymentsView();
-        PaymentsController paymentsController = new PaymentsController(paymentsView);
-        paymentsView.setController(paymentsController);
-        views.put("Pagamentos", paymentsView.getView());
+        views.put("Pagamentos", new PaymentsView().getView());
 
         ReportsView reportsView = new ReportsView();
         new ReportsController(reportsView);
