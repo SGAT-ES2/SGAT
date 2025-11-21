@@ -3,6 +3,8 @@ package com.sgat.model;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class ClientDAO {
 
@@ -27,7 +29,7 @@ public class ClientDAO {
                 ));
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            Logger.getLogger(ClientDAO.class.getName()).log(Level.SEVERE, "Error getting all clients", e);
         }
         return clients;
     }
@@ -46,7 +48,7 @@ public class ClientDAO {
             pstmt.setInt(7, client.getTravelCount());
             pstmt.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            Logger.getLogger(ClientDAO.class.getName()).log(Level.SEVERE, "Error adding client", e);
         }
     }
 
@@ -65,7 +67,7 @@ public class ClientDAO {
             pstmt.setInt(8, client.getId());
             pstmt.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            Logger.getLogger(ClientDAO.class.getName()).log(Level.SEVERE, "Error updating client", e);
         }
     }
 
@@ -77,7 +79,34 @@ public class ClientDAO {
             pstmt.setInt(1, client.getId());
             pstmt.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            Logger.getLogger(ClientDAO.class.getName()).log(Level.SEVERE, "Error deleting client", e);
         }
+    }
+
+    public Client getClientById(int id) {
+        String sql = "SELECT * FROM clientes WHERE id = ?";
+        Client client = null;
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, id);
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                client = new Client(
+                        rs.getInt("id"),
+                        rs.getString("name"),
+                        rs.getString("email"),
+                        rs.getString("phone"),
+                        rs.getString("cpf"),
+                        rs.getString("address"),
+                        rs.getString("preferences"),
+                        rs.getInt("travel_count")
+                );
+            }
+        } catch (SQLException e) {
+            Logger.getLogger(ClientDAO.class.getName()).log(Level.SEVERE, "Error getting client by ID", e);
+        }
+        return client;
     }
 }

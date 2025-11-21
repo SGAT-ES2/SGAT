@@ -20,3 +20,13 @@ CREATE TABLE clientes (
     preferences TEXT,
     travel_count INTEGER DEFAULT 0
 );
+
+CREATE TABLE reserva (
+    id SERIAL PRIMARY KEY,
+    cliente_id INTEGER REFERENCES clientes(id),
+    pacote_id INTEGER REFERENCES pacote_turistico(id),
+    data_reserva DATE NOT NULL,
+    numero_passageiros INTEGER NOT NULL,
+    valor_total NUMERIC(10, 2) NOT NULL,
+    status VARCHAR(50) NOT NULL
+);

@@ -32,6 +32,10 @@ public class Reservation {
         this.status = new SimpleStringProperty(status);
     }
 
+    public Reservation(Client client, Package travelPackage, LocalDate travelDate, int numberOfPassengers, double totalValue, String status) {
+        this(0, client, travelPackage, travelDate, numberOfPassengers, totalValue, status);
+    }
+
     // --- Getters and Properties ---
 
     public int getId() { return id.get(); }
