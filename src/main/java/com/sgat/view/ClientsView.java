@@ -27,7 +27,7 @@ public class ClientsView {
     public ClientsView(Stage stage) {
         this.stage = stage;
         this.clients = FXCollections.observableArrayList();
-        this.controller = new ClientsController(this, clients);
+        this.controller = new ClientsController(this);
         view = new VBox(24);
         view.setPadding(new Insets(24));
 
@@ -45,11 +45,7 @@ public class ClientsView {
     }
 
     private void setupData() {
-        clients.addAll(
-            new Client(1, "Beatriz Oliveira", "beatriz.oliveira@example.com", "(11) 98765-4321", "123.456.789-00", "Rua das Flores, 123, São Paulo, SP", "Prefere destinos de praia e resorts all-inclusive. Gosta de viajar em família.", 5),
-            new Client(2, "Carlos Pereira", "carlos.pereira@example.com", "(21) 91234-5678", "987.654.321-00", "Avenida Copacabana, 456, Rio de Janeiro, RJ", "Interessado em turismo de aventura, como trilhas e montanhismo. Viagens solo.", 8),
-            new Client(3, "Fernanda Costa", "fernanda.costa@example.com", "(31) 99999-8888", "456.789.123-00", "Rua da Bahia, 789, Belo Horizonte, MG", "Foco em viagens culturais, museus, e gastronomia local. Viaja com o parceiro.", 3)
-        );
+        clients.setAll(controller.getAllClients());
     }
 
     private Node createHeader() {
@@ -128,6 +124,7 @@ public class ClientsView {
     private void handleAddClient() {
         showClientDialog(null).ifPresent(client -> {
             controller.addClient(client);
+            setupData(); // Recarrega os dados para atualizar a tabela
             showAlert(Alert.AlertType.INFORMATION, "Cliente Adicionado", "Novo cliente cadastrado com sucesso.");
         });
     }
@@ -135,6 +132,7 @@ public class ClientsView {
     private void handleEditClient(Client client) {
         showClientDialog(client).ifPresent(editedClient -> {
             controller.updateClient(editedClient);
+            setupData(); // Recarrega os dados
             showAlert(Alert.AlertType.INFORMATION, "Cliente Atualizado", "Os dados do cliente foram atualizados.");
         });
     }
@@ -149,6 +147,7 @@ public class ClientsView {
         confirmation.showAndWait().ifPresent(response -> {
             if (response == ButtonType.OK) {
                 controller.deleteClient(client);
+                setupData(); // Recarrega os dados
                 showAlert(Alert.AlertType.INFORMATION, "Cliente Removido", "O cliente foi removido com sucesso.");
             }
         });

@@ -9,3 +9,14 @@ CREATE TABLE pacote_turistico (
     itinerario TEXT NOT NULL,
     descricao TEXT
 );
+
+CREATE TABLE clientes (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    phone VARCHAR(20),
+    cpf VARCHAR(14) NOT NULL UNIQUE,
+    address TEXT,
+    preferences TEXT,
+    travel_count INTEGER DEFAULT 0
+);
