@@ -1,43 +1,38 @@
 package com.sgat.controller;
 
 import com.sgat.model.Reservation;
+import com.sgat.model.ReservationDAO;
 import com.sgat.view.ReservationsView;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class ReservationsController {
 
-    private final ReservationsView view;
-    private final List<Reservation> reservations;
+    private final ReservationDAO dao;
 
-    public ReservationsController(ReservationsView view, List<Reservation> reservations) {
-        this.view = view;
-        this.reservations = reservations;
+    public ReservationsController() {
+        this.dao = new ReservationDAO();
     }
 
     public void addReservation(Reservation reservation) {
-        reservations.add(reservation);
+        dao.addReservation(reservation);
     }
 
     public void updateReservation(Reservation reservation) {
-        reservations.removeIf(r -> r.equals(reservation));
-        reservations.add(reservation);
+        dao.updateReservation(reservation);
     }
 
     public void deleteReservation(Reservation reservation) {
-        reservations.remove(reservation);
+        dao.deleteReservation(reservation);
     }
 
     public Reservation getReservation(int id) {
-        for (Reservation reservation : reservations) {
-            if (reservation.getId() == id)
-                return reservation;
-        }
-        return null;
+        return dao.getReservationById(id);
     }
 
     public List<Reservation> getAllReservations() {
-        return reservations;
+        return dao.getAllReservations();
     }
 }

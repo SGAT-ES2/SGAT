@@ -1,8 +1,10 @@
 package com.sgat.model;
 
 import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -10,6 +12,7 @@ import javafx.beans.property.StringProperty;
 import java.time.LocalDate;
 
 public class Package {
+    private final IntegerProperty id;
     private final StringProperty nomePacote;
     private final StringProperty destination;
     private final StringProperty description;
@@ -19,7 +22,8 @@ public class Package {
     private final ObjectProperty<LocalDate> endDate;
     private final StringProperty itinerary;
 
-    public Package(String nomePacote, String destination, String description, String duration, double price, LocalDate startDate, LocalDate endDate, String itinerary) {
+    public Package(int id, String nomePacote, String destination, String description, String duration, double price, LocalDate startDate, LocalDate endDate, String itinerary) {
+        this.id = new SimpleIntegerProperty(id);
         this.nomePacote = new SimpleStringProperty(nomePacote);
         this.destination = new SimpleStringProperty(destination);
         this.description = new SimpleStringProperty(description);
@@ -29,6 +33,13 @@ public class Package {
         this.endDate = new SimpleObjectProperty<>(endDate);
         this.itinerary = new SimpleStringProperty(itinerary);
     }
+    
+    public Package(String nomePacote, String destination, String description, String duration, double price, LocalDate startDate, LocalDate endDate, String itinerary) {
+        this(0, nomePacote, destination, description, duration, price, startDate, endDate, itinerary);
+    }
+
+    public int getId() { return id.get(); }
+    public IntegerProperty idProperty() { return id; }
 
     // Getters e Setters
     public String getNomePacote() { return nomePacote.get(); }

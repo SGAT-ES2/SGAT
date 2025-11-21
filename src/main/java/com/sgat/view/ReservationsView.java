@@ -1,7 +1,10 @@
 package com.sgat.view;
 
+import com.sgat.controller.ReservationsController;
 import com.sgat.model.Client;
+import com.sgat.model.ClientDAO;
 import com.sgat.model.Package;
+import com.sgat.model.PackageDAO;
 import com.sgat.model.Reservation;
 import javafx.stage.Stage;
 import javafx.collections.FXCollections;
@@ -12,52 +15,49 @@ import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.shape.SVGPath;
+import javafx.util.StringConverter;
+import org.kordamp.ikonli.javafx.FontIcon;
+import org.kordamp.ikonli.materialdesign2.MaterialDesignA;
+import org.kordamp.ikonli.materialdesign2.MaterialDesignC;
+import org.kordamp.ikonli.materialdesign2.MaterialDesignP;
 
 import java.time.LocalDate;
 import java.util.Optional;
 
-
-import org.kordamp.ikonli.javafx.FontIcon;
-import org.kordamp.ikonli.materialdesign2.MaterialDesignA; // Para MDI_ACCOUNT_MULTIPLE
-import org.kordamp.ikonli.materialdesign2.MaterialDesignC; // Para MDI_CALENDAR, MDI_CREDIT_CARD
-import org.kordamp.ikonli.materialdesign2.MaterialDesignP; // Para MDI_PACKAGE_VARIANT_CLOSED
-
-
 public class ReservationsView {
     private final Stage stage;
     private final VBox view;
-    private TableView<Reservation> table;
-    private final ObservableList<Reservation> reservations = FXCollections.observableArrayList();
+    private final TableView<Reservation> table;
+    private final ReservationsController controller;
+    private final ClientDAO clientDAO;
+    private final PackageDAO packageDAO;
 
     public ReservationsView(Stage stage) {
         this.stage = stage;
+        this.controller = new ReservationsController();
+        this.clientDAO = new ClientDAO();
+        this.packageDAO = new PackageDAO();
+
         view = new VBox(24);
         view.setPadding(new Insets(24));
 
         Node header = createHeader();
-        Node tableCard = createTableCard();
+        table = createTable();
+        Node tableCard = createTableCard(table);
 
         view.getChildren().addAll(header, tableCard);
         VBox.setVgrow(tableCard, Priority.ALWAYS);
 
-        setupData();
+        loadReservations();
+    }
+
+    private void loadReservations() {
+        ObservableList<Reservation> reservations = FXCollections.observableArrayList(controller.getAllReservations());
+        table.setItems(reservations);
     }
 
     public Node getView() {
         return view;
-    }
-
-    private void setupData() {
-        Client client1 = new Client(1, "Beatriz Oliveira", "beatriz.oliveira@example.com", "(11) 98765-4321", "123.456.789-00", "Rua das Flores, 123, São Paulo, SP", "Prefere destinos de praia e resorts all-inclusive. Gosta de viajar em família.", 5);
-        Client client2 = new Client(2, "Carlos Pereira", "carlos.pereira@example.com", "(21) 91234-5678", "987.654.321-00", "Avenida Copacabana, 456, Rio de Janeiro, RJ", "Interessado em turismo de aventura, como trilhas e montanhismo. Viagens solo.", 8);
-
-        Package package1 = new Package("Férias em Cancún", "Cancún", "Pacote de 7 dias em resort all-inclusive", "7 dias", 2500.00, LocalDate.of(2025, 10, 20), LocalDate.of(2025, 10, 27), "Inclui passagem aérea, hospedagem e passeios.");
-        Package package2 = new Package("Aventura na Patagônia", "Patagônia", "Pacote de 10 dias com trilhas e escaladas", "10 dias", 4500.00, LocalDate.of(2025, 11, 15), LocalDate.of(2025, 11, 25), "Inclui guias, equipamentos e acomodação em refúgios de montanha.");
-
-        reservations.addAll(
-            new Reservation(1, client1, package1, LocalDate.of(2025, 10, 20), 2, 5000.00, "Confirmada"),
-            new Reservation(2, client2, package2, LocalDate.of(2025, 11, 15), 1, 4500.00, "Pendente")
-        );
     }
 
     private Node createHeader() {
@@ -85,7 +85,7 @@ public class ReservationsView {
         return header;
     }
 
-    private Node createTableCard() {
+    private Node createTableCard(TableView<Reservation> table) {
         VBox card = new VBox(12);
         card.getStyleClass().add("table-card");
         VBox.setVgrow(card, Priority.ALWAYS);
@@ -95,7 +95,6 @@ public class ReservationsView {
         Label subtitle = new Label("Todas as reservas cadastradas no sistema.");
         subtitle.getStyleClass().add("info-card-subtitle");
 
-        table = createTable();
         VBox.setVgrow(table, Priority.ALWAYS);
 
         card.getChildren().addAll(title, subtitle, table);
@@ -103,7 +102,7 @@ public class ReservationsView {
     }
 
     private TableView<Reservation> createTable() {
-        TableView<Reservation> tableView = new TableView<>(reservations);
+        TableView<Reservation> tableView = new TableView<>();
         tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
 
         TableColumn<Reservation, Client> clientCol = new TableColumn<>("Cliente");
@@ -141,7 +140,8 @@ public class ReservationsView {
 
     private void handleAddReservation() {
         showReservationDialog(null).ifPresent(reservation -> {
-            reservations.add(reservation);
+            controller.addReservation(reservation);
+            loadReservations();
             showAlert(Alert.AlertType.INFORMATION, "Reserva Adicionada", "Nova reserva cadastrada com sucesso.");
         });
     }
@@ -162,19 +162,11 @@ public class ReservationsView {
         grid.setPadding(new Insets(20, 20, 10, 10));
 
         ComboBox<Client> clientComboBox = new ComboBox<>();
-        // Dummy data for clients
-        ObservableList<Client> clients = FXCollections.observableArrayList(
-            new Client(1, "Beatriz Oliveira", "beatriz.oliveira@example.com", "(11) 98765-4321", "123.456.789-00", "Rua das Flores, 123, São Paulo, SP", "Prefere destinos de praia e resorts all-inclusive. Gosta de viajar em família.", 5),
-            new Client(2, "Carlos Pereira", "carlos.pereira@example.com", "(21) 91234-5678", "987.654.321-00", "Avenida Copacabana, 456, Rio de Janeiro, RJ", "Interessado em turismo de aventura, como trilhas e montanhismo. Viagens solo.", 8)
-        );
+        ObservableList<Client> clients = FXCollections.observableArrayList(clientDAO.getAllClients());
         clientComboBox.setItems(clients);
 
         ComboBox<Package> packageComboBox = new ComboBox<>();
-        // Dummy data for packages
-        ObservableList<Package> packages = FXCollections.observableArrayList(
-            new Package("Férias em Cancún", "Cancún", "Pacote de 7 dias em resort all-inclusive", "7 dias", 2500.00, LocalDate.of(2025, 10, 20), LocalDate.of(2025, 10, 27), "Inclui passagem aérea, hospedagem e passeios."),
-            new Package("Aventura na Patagônia", "Patagônia", "Pacote de 10 dias com trilhas e escaladas", "10 dias", 4500.00, LocalDate.of(2025, 11, 15), LocalDate.of(2025, 11, 25), "Inclui guias, equipamentos e acomodação em refúgios de montanha.")
-        );
+        ObservableList<Package> packages = FXCollections.observableArrayList(packageDAO.getAllPackages());
         packageComboBox.setItems(packages);
 
         DatePicker travelDatePicker = new DatePicker();
@@ -185,7 +177,7 @@ public class ReservationsView {
         ComboBox<String> statusComboBox = new ComboBox<>();
         statusComboBox.setItems(FXCollections.observableArrayList("Confirmada", "Pendente", "Cancelada"));
 
-        class StatusCell extends ListCell<String> {
+        class StatusListCell extends ListCell<String> {
             @Override
             protected void updateItem(String item, boolean empty) {
                 super.updateItem(item, empty);
@@ -199,9 +191,33 @@ public class ReservationsView {
             }
         }
 
-        statusComboBox.setCellFactory(cell -> new StatusCell());
-        statusComboBox.setButtonCell(new StatusCell());
+        statusComboBox.setCellFactory(cell -> new StatusListCell());
+        statusComboBox.setButtonCell(new StatusListCell());
         TextArea observationsArea = new TextArea();
+        
+        clientComboBox.setConverter(new StringConverter<>() {
+            @Override
+            public String toString(Client client) {
+                return client == null ? "" : client.getName();
+            }
+
+            @Override
+            public Client fromString(String string) {
+                return null;
+            }
+        });
+
+        packageComboBox.setConverter(new StringConverter<>() {
+            @Override
+            public String toString(Package pkg) {
+                return pkg == null ? "" : pkg.getNomePacote();
+            }
+
+            @Override
+            public Package fromString(String string) {
+                return null;
+            }
+        });
 
         grid.add(new Label("Cliente:"), 0, 0);
         grid.add(clientComboBox, 1, 0);
@@ -223,13 +239,12 @@ public class ReservationsView {
         dialog.setResultConverter(dialogButton -> {
             if (dialogButton == ButtonType.OK) {
                 return new Reservation(
-                    reservations.size() + 1,
-                    clientComboBox.getValue(),
-                    packageComboBox.getValue(),
-                    travelDatePicker.getValue(),
-                    Integer.parseInt(passengersField.getText()),
-                    Double.parseDouble(valueField.getText()),
-                    statusComboBox.getValue()
+                        clientComboBox.getValue(),
+                        packageComboBox.getValue(),
+                        travelDatePicker.getValue(),
+                        Integer.parseInt(passengersField.getText()),
+                        Double.parseDouble(valueField.getText()),
+                        statusComboBox.getValue()
                 );
             }
             return null;
@@ -246,7 +261,7 @@ public class ReservationsView {
         alert.showAndWait();
     }
 
-    private class StatusCell extends TableCell<Reservation, String> {
+    private static class StatusCell extends TableCell<Reservation, String> {
         private final Label statusLabel;
 
         public StatusCell() {
@@ -268,7 +283,7 @@ public class ReservationsView {
         }
     }
 
-    private class ValueCell extends TableCell<Reservation, Double> {
+    private static class ValueCell extends TableCell<Reservation, Double> {
         @Override
         protected void updateItem(Double item, boolean empty) {
             super.updateItem(item, empty);
@@ -280,7 +295,7 @@ public class ReservationsView {
         }
     }
 
-    private class ClientCell extends TableCell<Reservation, Client> {
+    private static class ClientCell extends TableCell<Reservation, Client> {
         private final HBox box;
         private final FontIcon icon;
         private final Label label;
@@ -307,7 +322,7 @@ public class ReservationsView {
         }
     }
 
-    private class PackageCell extends TableCell<Reservation, Package> {
+    private static class PackageCell extends TableCell<Reservation, Package> {
         private final HBox box;
         private final FontIcon icon;
         private final Label label;
@@ -334,7 +349,7 @@ public class ReservationsView {
         }
     }
 
-    private class DateCell extends TableCell<Reservation, LocalDate> {
+    private static class DateCell extends TableCell<Reservation, LocalDate> {
         private final HBox box;
         private final FontIcon icon;
         private final Label label;
