@@ -1,4 +1,4 @@
-package com.sgat.view;
+package com.sgat.view; 
 
 import java.text.NumberFormat;
 import java.util.Locale;
@@ -25,18 +25,15 @@ public class PaymentsView {
     private PaymentsController controller;
     private VBox tableBody; 
 
-    // 🚨 NOVOS CAMPOS: Referências aos labels dos cards de sumário
     private Label receivedValueLabel; 
     private Label pendingValueLabel;  
 
-    // --- Definições de Larguras de Colunas (AJUSTE FORÇADO) ---
-    // Larguras mínimas/preferenciais para controle
-    private static final double COL_RES_WIDTH = 200; // Maior espaço garantido para a Reserva
-    private static final double COL_VAL_WIDTH = 120; // Largura suficiente para valores e o R$
+    private static final double COL_RES_WIDTH = 200; 
+    private static final double COL_VAL_WIDTH = 120; 
     private static final double COL_MET_WIDTH = 130; 
     private static final double COL_DAT_WIDTH = 120;
     private static final double COL_STA_WIDTH = 80;
-    private static final double COLUMN_GAP = 12; // Espaçamento fixo entre colunas (substitui o spacer)
+    private static final double COLUMN_GAP = 12; 
 
     public PaymentsView() {
         view = new VBox(24);
@@ -119,7 +116,6 @@ public class PaymentsView {
         }
     }
     
-    // --- 1. CABEÇALHO (Omitido por brevidade) ---
     private Node createHeader() {
         HBox header = new HBox(12);
         header.setAlignment(Pos.CENTER_LEFT);
@@ -136,15 +132,16 @@ public class PaymentsView {
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
         Button registerButton = new Button("+ Registrar Pagamento");
-        
+
+        // 🔵 BOTÃO AZUL + TAMANHO MENOR (igual ao outro layout)
         registerButton.setStyle(
-            "-fx-background-color: #4CAF50;" + 
+            "-fx-background-color: #2196F3;" +
             "-fx-text-fill: white;" +
             "-fx-font-weight: bold;" +
-            "-fx-padding: 12px 24px;" +
-            "-fx-background-radius: 8px;" +
+            "-fx-padding: 6px 14px;" +      // tamanho reduzido
+            "-fx-background-radius: 6px;" +
             "-fx-cursor: hand;" +
-            "-fx-font-size: 14px;"
+            "-fx-font-size: 12px;"          // fonte menor
         );
         
         registerButton.setOnAction(event -> {
@@ -158,7 +155,6 @@ public class PaymentsView {
         return header;
     }
 
-    // --- 2. CARDS DE SUMÁRIO (Omitido por brevidade) ---
     private Node createSummaryCards() {
         HBox summaryBox = new HBox(24);
         
@@ -215,7 +211,6 @@ public class PaymentsView {
         return box;
     }
 
-    // --- 3. HISTÓRICO DE PAGAMENTOS (Ajustado) ---
     private Node createHistoryCard() {
         VBox card = new VBox(12);
         card.getStyleClass().add("info-card");
@@ -240,34 +235,28 @@ public class PaymentsView {
     }
 
     private HBox createHistoryHeader() {
-        // 🚨 Adicionado espaçamento fixo ao HBox para separar colunas
         HBox header = new HBox(COLUMN_GAP); 
         header.getStyleClass().add("column-header-background"); 
         header.setPadding(new Insets(10, 16, 10, 16));
 
-        // 🚨 Configuração de Larguras e Prioridades
         Label resLabel = createHeaderLabel("Reserva", COL_RES_WIDTH, Pos.CENTER_LEFT); 
         Label totalLabel = createHeaderLabel("Valor Total", COL_VAL_WIDTH, Pos.CENTER_RIGHT); 
         Label pagoLabel = createHeaderLabel("Valor Pago", COL_VAL_WIDTH, Pos.CENTER_RIGHT); 
         Label pendenteLabel = createHeaderLabel("Pendente", COL_VAL_WIDTH, Pos.CENTER_RIGHT); 
         
-        // 🚨 SPACER REMOVIDO
-        
         Label metodoLabel = createHeaderLabel("Método", COL_MET_WIDTH, Pos.CENTER_LEFT); 
         Label dataLabel = createHeaderLabel("Data", COL_DAT_WIDTH, Pos.CENTER_LEFT); 
         Label statusLabel = createHeaderLabel("Status", COL_STA_WIDTH, Pos.CENTER); 
 
-        // PRIORIDADES: Reserva deve absorver mais espaço, as colunas de valor crescem SOMETIMES.
-        HBox.setHgrow(resLabel, Priority.ALWAYS); // Crescimento máximo para a Reserva
+        HBox.setHgrow(resLabel, Priority.ALWAYS); 
         HBox.setHgrow(totalLabel, Priority.SOMETIMES);
         HBox.setHgrow(pagoLabel, Priority.SOMETIMES);
         HBox.setHgrow(pendenteLabel, Priority.SOMETIMES);
         
         HBox.setHgrow(metodoLabel, Priority.SOMETIMES); 
         HBox.setHgrow(dataLabel, Priority.SOMETIMES); 
-        HBox.setHgrow(statusLabel, Priority.NEVER); // Status não precisa crescer
+        HBox.setHgrow(statusLabel, Priority.NEVER); 
 
-        // 🚨 SPACER REMOVIDO, lista simplificada
         header.getChildren().addAll(resLabel, totalLabel, pagoLabel, pendenteLabel, metodoLabel, dataLabel, statusLabel);
         return header;
     }
@@ -290,7 +279,6 @@ public class PaymentsView {
     }
 
     private Node createHistoryRow(String reservation, String total, String paid, String pending, String method, String date, String status) {
-        // 🚨 Adicionado espaçamento fixo ao HBox para separar colunas
         HBox row = new HBox(COLUMN_GAP); 
         row.getStyleClass().add("list-item"); 
         row.setPadding(new Insets(12, 16, 12, 16));
@@ -311,14 +299,10 @@ public class PaymentsView {
         HBox.setHgrow(resBox, Priority.ALWAYS); 
         resBox.setAlignment(Pos.CENTER_LEFT); 
         
-        // Colunas de Valor: Usam COL_VAL_WIDTH e Priority.SOMETIMES
         Label lblTotal = createAlignedDataLabel(total, "#666666", COL_VAL_WIDTH, Pos.CENTER_RIGHT, Priority.SOMETIMES);
         Label lblPaid = createAlignedDataLabel(paid, "#388e3c", COL_VAL_WIDTH, Pos.CENTER_RIGHT, Priority.SOMETIMES); 
         Label lblPending = createAlignedDataLabel(pending, "#ef6c00", COL_VAL_WIDTH, Pos.CENTER_RIGHT, Priority.SOMETIMES); 
         
-        // 🚨 SPACER REMOVIDO
-        
-        // Colunas de texto: Usam suas larguras e Priority.SOMETIMES
         Label lblMethod = createAlignedDataLabel(method, "#424242", COL_MET_WIDTH, Pos.CENTER_LEFT, Priority.SOMETIMES);
         Label lblDate = createAlignedDataLabel(date, "#666666", COL_DAT_WIDTH, Pos.CENTER_LEFT, Priority.SOMETIMES);
 
@@ -335,11 +319,9 @@ public class PaymentsView {
         
         lblStatus.setMinWidth(COL_STA_WIDTH);
         lblStatus.setPrefWidth(COL_STA_WIDTH);
-        HBox.setHgrow(lblStatus, Priority.NEVER); // Status tem tamanho fixo
+        HBox.setHgrow(lblStatus, Priority.NEVER);
         lblStatus.setAlignment(Pos.CENTER); 
 
-
-        // 🚨 SPACER REMOVIDO, lista simplificada
         row.getChildren().addAll(resBox, lblTotal, lblPaid, lblPending, lblMethod, lblDate, lblStatus);
 
         row.setOnMouseClicked(event -> {
