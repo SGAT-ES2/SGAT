@@ -1,6 +1,7 @@
 package com.sgat.view;
 
 import com.sgat.model.Package;
+import com.sgat.model.PackageDAO;
 import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
@@ -25,6 +26,7 @@ public class PackagesView {
     private final TilePane packagesGrid;
     private final ObservableList<Package> packages = FXCollections.observableArrayList();
     private final NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(new Locale("pt", "BR"));
+    private final PackageDAO packageDAO = new PackageDAO();
 
     public PackagesView(Stage stage) {
         this.stage = stage;
@@ -45,12 +47,7 @@ public class PackagesView {
     }
 
     private void setupData() {
-        packages.addAll(
-            new Package("Aventura na Patagônia", "El Calafate, Argentina", "Explore as geleiras e montanhas da Patagônia em uma viagem inesquecível.", "10 dias / 9 noites", 12500.00, LocalDate.of(2026, 5, 20), LocalDate.of(2026, 5, 30), "Dia 1-3: El Calafate e Glaciar Perito Moreno. Dia 4-7: El Chaltén e trilhas. Dia 8-10: Ushuaia, o fim do mundo."),
-            new Package("Cultura e Cores do Japão", "Tóquio e Kyoto, Japão", "Uma imersão completa na cultura japonesa, dos templos antigos à metrópole futurista.", "12 dias / 11 noites", 22000.00, LocalDate.of(2026, 4, 10), LocalDate.of(2026, 4, 22), "Dia 1-5: Exploração de Tóquio (Shibuya, Akihabara). Dia 6-10: Viagem para Kyoto (templos, gueixas). Dia 11-12: Retorno."),
-            new Package("Safári na Tanzânia", "Serengeti, Tanzânia", "Testemunhe a grande migração e a vida selvagem africana em um safári de luxo.", "7 dias / 6 noites", 18500.00, LocalDate.of(2026, 7, 15), LocalDate.of(2026, 7, 22), "Dia 1-2: Chegada em Arusha. Dia 3-6: Safári no Parque Nacional Serengeti. Dia 7: Retorno.")
-        );
-
+        packages.setAll(packageDAO.getAllPackages());
         packages.addListener((ListChangeListener<Package>) c -> rebuildPackageGrid());
     }
 
@@ -99,7 +96,7 @@ public class PackagesView {
         BorderPane header = new BorderPane();
         VBox titleBox = new VBox(-2);
         Label nameLabel = new Label();
-        nameLabel.textProperty().bind(pkg.nameProperty());
+        nameLabel.textProperty().bind(pkg.nomePacoteProperty());
         nameLabel.getStyleClass().add("package-card-title");
 
         HBox destinationBox = new HBox(4);
@@ -175,6 +172,7 @@ public class PackagesView {
 
     private void handleAddPackage() {
         showPackageDialog(null).ifPresent(newPackage -> {
+            packageDAO.addPackage(newPackage);
             packages.add(newPackage);
             showAlert(Alert.AlertType.INFORMATION, "Pacote Adicionado", "O novo pacote foi cadastrado com sucesso.");
         });
@@ -182,7 +180,8 @@ public class PackagesView {
 
     private void handleEditPackage(Package pkg) {
         showPackageDialog(pkg).ifPresent(editedPackage -> {
-            // As propriedades já foram atualizadas, a UI se atualiza sozinha via bindings.
+            packageDAO.updatePackage(editedPackage);
+            // A UI se atualiza sozinha via bindings.
             showAlert(Alert.AlertType.INFORMATION, "Pacote Atualizado", "O pacote foi atualizado com sucesso.");
         });
     }
@@ -191,11 +190,12 @@ public class PackagesView {
         Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION);
         confirmation.initOwner(this.stage);
         confirmation.setTitle("Confirmar Exclusão");
-        confirmation.setHeaderText("Excluir Pacote: " + pkg.getName());
+        confirmation.setHeaderText("Excluir Pacote: " + pkg.getNomePacote());
         confirmation.setContentText("Você tem certeza que deseja remover este pacote? Esta ação não pode ser desfeita.");
 
         confirmation.showAndWait().ifPresent(response -> {
             if (response == ButtonType.OK) {
+                packageDAO.deletePackage(pkg);
                 packages.remove(pkg);
                 showAlert(Alert.AlertType.INFORMATION, "Pacote Removido", "O pacote foi removido com sucesso.");
             }
@@ -260,7 +260,7 @@ public class PackagesView {
         nameField.textProperty().addListener((obs, old, text) -> okButton.setDisable(text.trim().isEmpty()));
 
         if (pkg != null) {
-            nameField.setText(pkg.getName());
+            nameField.setText(pkg.getNomePacote());
             destField.setText(pkg.getDestination());
             priceField.setText(String.valueOf(pkg.getPrice()));
             durationField.setText(pkg.getDuration());
@@ -277,7 +277,7 @@ public class PackagesView {
                     if (pkg == null) {
                         return new Package(nameField.getText(), destField.getText(), descriptionArea.getText(), durationField.getText(), price, startDatePicker.getValue(), endDatePicker.getValue(), itineraryArea.getText());
                     } else {
-                        pkg.setName(nameField.getText());
+                        pkg.setNomePacote(nameField.getText());
                         pkg.setDestination(destField.getText());
                         pkg.setPrice(price);
                         pkg.setDuration(durationField.getText());

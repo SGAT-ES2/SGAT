@@ -1,11 +1,16 @@
 package com.sgat.model;
 
-import javafx.beans.property.*;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 
 import java.time.LocalDate;
 
 public class Package {
-    private final StringProperty name;
+    private final StringProperty nomePacote;
     private final StringProperty destination;
     private final StringProperty description;
     private final StringProperty duration;
@@ -14,8 +19,8 @@ public class Package {
     private final ObjectProperty<LocalDate> endDate;
     private final StringProperty itinerary;
 
-    public Package(String name, String destination, String description, String duration, double price, LocalDate startDate, LocalDate endDate, String itinerary) {
-        this.name = new SimpleStringProperty(name);
+    public Package(String nomePacote, String destination, String description, String duration, double price, LocalDate startDate, LocalDate endDate, String itinerary) {
+        this.nomePacote = new SimpleStringProperty(nomePacote);
         this.destination = new SimpleStringProperty(destination);
         this.description = new SimpleStringProperty(description);
         this.duration = new SimpleStringProperty(duration);
@@ -26,9 +31,9 @@ public class Package {
     }
 
     // Getters e Setters
-    public String getName() { return name.get(); }
-    public void setName(String name) { this.name.set(name); }
-    public StringProperty nameProperty() { return name; }
+    public String getNomePacote() { return nomePacote.get(); }
+    public void setNomePacote(String nomePacote) { this.nomePacote.set(nomePacote); }
+    public StringProperty nomePacoteProperty() { return nomePacote; }
 
     public String getDestination() { return destination.get(); }
     public void setDestination(String destination) { this.destination.set(destination); }

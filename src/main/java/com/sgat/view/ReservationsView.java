@@ -328,7 +328,7 @@ public class ReservationsView {
             if (empty || item == null) {
                 setGraphic(null);
             } else {
-                label.setText(item.getName());
+                label.setText(item.getNomePacote());
                 setGraphic(box);
             }
         }
