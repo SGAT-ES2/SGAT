@@ -1,14 +1,13 @@
 package com.sgat;
 
-import com.sgat.view.LoginView;
-import com.sgat.view.MainLayout;
+import com.sgat.controller.ScreenController;
 import javafx.application.Application;
 import javafx.scene.Scene;
+import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-
 import java.util.Objects;
 
 public class Main extends Application {
@@ -21,15 +20,14 @@ public class Main extends Application {
     public void start(Stage primaryStage) {
         primaryStage.setTitle("TravelManager");
 
-        // Cria o layout principal
-        LoginView loginView = new LoginView();
-
         // --- Scene and Stage ---
-        Scene scene = new Scene(loginView.getView());
+        Scene scene = new Scene(new Pane()); // Inicia com uma cena vazia
         scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/com/sgat/views/MainStyles.css")).toExternalForm());
-
         primaryStage.setScene(scene);
-        primaryStage.setFullScreen(true);
+
+        ScreenController screenController = new ScreenController(primaryStage, scene);
+        screenController.showLoginScreen();
+
         primaryStage.show();
     }
 
@@ -41,6 +39,5 @@ public class Main extends Application {
             throw new RuntimeException(e);
         }
         launch(args);
-
     }
 }

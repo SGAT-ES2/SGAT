@@ -1,11 +1,9 @@
 package com.sgat.view;
-
-import com.sgat.view.MainLayout;
+import com.sgat.controller.ScreenController;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
@@ -13,15 +11,19 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.SVGPath;
-import javafx.stage.Stage;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.materialdesign2.MaterialDesignK;
 import org.kordamp.ikonli.materialdesign2.MaterialDesignL;
 
 public class LoginView {
 
-    public Parent getView() {
-        StackPane root = new StackPane();
+    private final ScreenController screenController;
+    private final StackPane root;
+
+    public LoginView(ScreenController screenController) {
+        this.screenController = screenController;
+
+        root = new StackPane();
         root.getStyleClass().add("login-root");
 
         VBox card = new VBox(15);
@@ -60,7 +62,6 @@ public class LoginView {
         loginButton.setOnAction(e -> {
             String username = emailField.getText();
             String password = passwordField.getText();
-            Stage stage = (Stage) loginButton.getScene().getWindow();
 
             errorLabel.setVisible(false);
             errorLabel.setManaged(false);
@@ -68,10 +69,7 @@ public class LoginView {
             if (username.isEmpty() || password.isEmpty()) {
                 showError(errorLabel, "Por favor, preencha todos os campos");
             } else if (username.equals("admin") && password.equals("admin123")) {
-                MainLayout mainLayout = new MainLayout(stage);
-                Scene scene = stage.getScene();
-                scene.setRoot(mainLayout.getLayout());
-                stage.setFullScreen(true);
+                screenController.showMainScreen();
             } else {
                 showError(errorLabel, "Usuário ou senha inválidos.");
             }
@@ -84,7 +82,9 @@ public class LoginView {
                 errorLabel,
                 loginButton);
         root.getChildren().add(card);
+    }
 
+    public Parent getView() {
         return root;
     }
 
