@@ -1,19 +1,22 @@
 package com.sgat.model;
 
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import org.kordamp.ikonli.Ikon;
 
 public class Activity {
     private final StringProperty time;
     private final StringProperty title;
     private final StringProperty description;
-    private final StringProperty icon;
+    private final ObjectProperty<Ikon> icon;
 
-    public Activity(String time, String title, String description, String icon) {
+    public Activity(String time, String title, String description, Ikon icon) {
         this.time = new SimpleStringProperty(time);
         this.title = new SimpleStringProperty(title);
         this.description = new SimpleStringProperty(description);
-        this.icon = new SimpleStringProperty(icon);
+        this.icon = new SimpleObjectProperty<>(icon);
     }
 
     // Getters and Property Getters
@@ -41,11 +44,11 @@ public class Activity {
         return description;
     }
 
-    public String getIcon() {
+    public Ikon getIcon() {
         return icon.get();
     }
 
-    public StringProperty iconProperty() {
+    public ObjectProperty<Ikon> iconProperty() {
         return icon;
     }
 }

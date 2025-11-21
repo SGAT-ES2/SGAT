@@ -11,7 +11,8 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
-import javafx.scene.shape.SVGPath;
+import org.kordamp.ikonli.javafx.FontIcon;
+import org.kordamp.ikonli.materialdesign2.*;
 
 import java.time.LocalDate;
 import java.util.Optional;
@@ -21,16 +22,7 @@ public class ItinerariesView {
     private final Stage stage;
     private final VBox view;
     private final ObservableList<Itinerary> itineraries = FXCollections.observableArrayList();
-
-    // SVG Paths for Icons
-    private static final String PLUS_ICON = "M12 5v14m-7-7h14";
-    private static final String MAP_PIN_ICON = "M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z";
-    private static final String CALENDAR_ICON = "M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z";
-    private static final String CLOCK_ICON = "M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z";
-    private static final String PLANE_ICON = "M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z";
-    private static final String HOTEL_ICON = "M12 2L2 7v13h20V7L12 2zM6 18v-6h5v6H6zm7 0v-6h5v6h-5z";
-    private static final String UTENSILS_ICON = "M16 2v20M8 2v20M12 2v20";
-
+    private static final int ICON_SIZE = 20;
 
     public ItinerariesView(Stage stage) {
         this.stage = stage;
@@ -56,31 +48,25 @@ public class ItinerariesView {
 
         Day day1 = new Day(1, "Chegada em Paris");
         day1.getActivities().addAll(
-                new Activity("14:00", "Check-in no Hotel", "Chegada e check-in no Hotel Le Bristol.", HOTEL_ICON),
-                new Activity("16:00", "Passeio pelo Rio Sena", "Cruzeiro panorâmico pelo Rio Sena para uma primeira vista da cidade.", PLANE_ICON),
-                new Activity("20:00", "Jantar no Le Jules Verne", "Jantar no restaurante da Torre Eiffel.", UTENSILS_ICON)
+                new Activity("14:00", "Check-in no Hotel", "Chegada e check-in no Hotel Le Bristol.", MaterialDesignH.HOME),
+                new Activity("16:00", "Passeio pelo Rio Sena", "Cruzeiro panorâmico pelo Rio Sena para uma primeira vista da cidade.", MaterialDesignF.FERRY),
+                new Activity("20:00", "Jantar no Le Jules Verne", "Jantar no restaurante da Torre Eiffel.", MaterialDesignS.SILVERWARE_FORK_KNIFE)
         );
 
         Day day2 = new Day(2, "Cultura e Arte");
         day2.getActivities().addAll(
-                new Activity("09:00", "Museu do Louvre", "Visita guiada aos principais destaques do museu.", UTENSILS_ICON),
-                new Activity("13:00", "Almoço no Café Marly", "Almoço com vista para a pirâmide do Louvre.", UTENSILS_ICON),
-                new Activity("15:00", "Catedral de Notre-Dame", "Visita à área externa e arredores da catedral.", UTENSILS_ICON)
+                new Activity("09:00", "Museu do Louvre", "Visita guiada aos principais destaques do museu.", MaterialDesignB.BANK),
+                new Activity("13:00", "Almoço no Café Marly", "Almoço com vista para a pirâmide do Louvre.", MaterialDesignS.SILVERWARE_FORK_KNIFE),
+                new Activity("15:00", "Catedral de Notre-Dame", "Visita à área externa e arredores da catedral.", MaterialDesignC.CHURCH)
         );
         
         Day day3 = new Day(3, "Retorno");
         day3.getActivities().addAll(
-                new Activity("11:00", "Check-out do Hotel", "Check-out e transfer para o aeroporto.", HOTEL_ICON)
+                new Activity("11:00", "Check-out do Hotel", "Check-out e transfer para o aeroporto.", MaterialDesignH.HOME_EXPORT_OUTLINE)
         );
 
         itinerary.getDays().addAll(day1, day2, day3);
         itineraries.add(itinerary);
-    }
-
-    private SVGPath createIcon(String svgContent) {
-        SVGPath icon = new SVGPath();
-        icon.setContent(svgContent);
-        return icon;
     }
 
     private Node createHeader() {
@@ -99,7 +85,9 @@ public class ItinerariesView {
 
         Button generateButton = new Button("Gerar Itinerário");
         generateButton.getStyleClass().add("add-button");
-        generateButton.setGraphic(createIcon(PLUS_ICON));
+        FontIcon plusIcon = new FontIcon(MaterialDesignP.PLUS);
+        plusIcon.setIconSize(ICON_SIZE);
+        generateButton.setGraphic(plusIcon);
         generateButton.setOnAction(e -> showGenerateItineraryDialog());
 
         header.getChildren().addAll(titleBox, spacer, generateButton);
@@ -114,8 +102,10 @@ public class ItinerariesView {
         // Card Header
         HBox cardHeader = new HBox(8);
         cardHeader.setAlignment(Pos.CENTER_LEFT);
+        FontIcon mapIcon = new FontIcon(MaterialDesignM.MAP_MARKER);
+        mapIcon.setIconSize(ICON_SIZE);
         cardHeader.getChildren().addAll(
-                createIcon(MAP_PIN_ICON),
+                mapIcon,
                 new Label(String.format("%s - %s - %s", itinerary.getReservationId(), itinerary.getClientName(), itinerary.getPackageName()))
         );
         cardHeader.getStyleClass().add("info-card-title");
@@ -142,8 +132,10 @@ public class ItinerariesView {
 
         HBox dayTitleBox = new HBox(8);
         dayTitleBox.setAlignment(Pos.CENTER_LEFT);
+        FontIcon calendarIcon = new FontIcon(MaterialDesignC.CALENDAR);
+        calendarIcon.setIconSize(ICON_SIZE);
         dayTitleBox.getChildren().addAll(
-                createIcon(CALENDAR_ICON),
+                calendarIcon,
                 new Label(String.format("Dia %d - %s", day.getDayNumber(), day.getTitle()))
         );
         dayTitleBox.getStyleClass().add("day-title");
@@ -172,7 +164,9 @@ public class ItinerariesView {
         iconColumn.setAlignment(Pos.TOP_CENTER);
         iconColumn.setSpacing(8);
 
-        StackPane iconContainer = new StackPane(createIcon(activity.getIcon()));
+        FontIcon activityIcon = new FontIcon(activity.getIcon());
+        activityIcon.setIconSize(ICON_SIZE);
+        StackPane iconContainer = new StackPane(activityIcon);
         iconContainer.getStyleClass().add("timeline-icon-container");
         iconContainer.setAlignment(Pos.CENTER);
 
@@ -190,15 +184,17 @@ public class ItinerariesView {
 
         HBox timeBox = new HBox(8);
         timeBox.setAlignment(Pos.CENTER_LEFT);
-        timeBox.getChildren().addAll(createIcon(CLOCK_ICON), new Label(activity.getTime()));
+        FontIcon clockIcon = new FontIcon(MaterialDesignC.CLOCK_OUTLINE);
+        clockIcon.setIconSize(ICON_SIZE);
+        timeBox.getChildren().addAll(clockIcon, new Label(activity.getTime()));
         timeBox.getStyleClass().add("activity-time");
 
         Label titleLabel = new Label(activity.getTitle());
         titleLabel.getStyleClass().add("activity-title");
 
         Label descriptionLabel = new Label(activity.getDescription());
-        descriptionLabel.getStyleClass().add("activity-description");
         descriptionLabel.setWrapText(true);
+        descriptionLabel.getStyleClass().add("activity-description");
 
         contentColumn.getChildren().addAll(timeBox, titleLabel, descriptionLabel);
         HBox.setHgrow(contentColumn, Priority.ALWAYS);

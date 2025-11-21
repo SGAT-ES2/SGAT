@@ -15,6 +15,7 @@ module com.sgat {
 
     // Permite abrir arquivos (Desktop.getDesktop())
     requires java.desktop;
+    requires org.kordamp.ikonli.core;
 
     // Abre controllers para o JavaFX
     opens com.sgat.controller to javafx.fxml;
