@@ -34,7 +34,6 @@ public class Main extends Application {
     public static void main(String[] args) {
         try {
             DriverManager.getConnection(DB_URL, DB_USER, DB_PASS);
-            System.out.println("FUNFOU");
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
