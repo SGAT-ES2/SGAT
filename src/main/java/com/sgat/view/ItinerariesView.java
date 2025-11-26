@@ -48,7 +48,7 @@ public class ItinerariesView {
         return view;
     }
 
-    private void loadReservations() {
+    public void loadReservations() {
         List<Reservation> reservations = reservationDAO.getAllReservations();
         reservationComboBox.setItems(FXCollections.observableArrayList(reservations));
         if (!reservations.isEmpty()) {
