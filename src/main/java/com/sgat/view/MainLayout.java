@@ -43,6 +43,7 @@ public class MainLayout {
     private final Map<String, Node> views = new HashMap<>();
     private final ToggleGroup toggleGroup = new ToggleGroup();
     private final int ICON_SIZE = 20;
+    private ItinerariesView itinerariesController;
 
     public MainLayout(Stage stage, ScreenController screenController) {
         this.stage = stage;
@@ -61,7 +62,8 @@ public class MainLayout {
         views.put("Pacotes", new PackagesView(stage).getView());
         views.put("Clientes", new ClientsView(stage).getView());
         views.put("Reservas", new ReservationsView(stage).getView());
-        views.put("Itinerários", new ItinerariesView(stage).getView());
+        this.itinerariesController = new ItinerariesView(stage);
+        views.put("Itinerários", itinerariesController.getView());
         // --- FIM DA INICIALIZAÇÃO DE VIEWS ---
 
         contentStack.getChildren().addAll(views.values());
@@ -267,6 +269,10 @@ public class MainLayout {
             boolean isVisible = entry.getKey().equals(viewName);
             entry.getValue().setVisible(isVisible);
             entry.getValue().setManaged(isVisible);
+        }
+        if ("Itinerários".equals(viewName)) {
+            // Chama o método público que criamos na ItinerariesView
+            itinerariesController.loadReservations();
         }
     }
 }

@@ -48,7 +48,7 @@ public class ItinerariesView {
         return view;
     }
 
-    private void loadReservations() {
+    public void loadReservations() {
         List<Reservation> reservations = reservationDAO.getAllReservations();
         reservationComboBox.setItems(FXCollections.observableArrayList(reservations));
         if (!reservations.isEmpty()) {
@@ -83,7 +83,7 @@ public class ItinerariesView {
 
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
-        
+
         reservationComboBox = new ComboBox<>();
         reservationComboBox.setPromptText("Selecione uma reserva");
         reservationComboBox.setConverter(new StringConverter<>() {
@@ -105,14 +105,7 @@ public class ItinerariesView {
         plusIcon.setIconSize(ICON_SIZE);
         addActivityButton.setGraphic(plusIcon);
         addActivityButton.setOnAction(e -> {
-            Reservation selectedReservation = reservationComboBox.getValue();
-            if (selectedReservation != null) {
-                showAddActivityDialog(selectedReservation);
-            } else {
-                Alert alert = new Alert(Alert.AlertType.WARNING, "Por favor, selecione uma reserva primeiro.");
-                alert.initOwner(stage);
-                alert.showAndWait();
-            }
+            showAddActivityDialog();
         });
 
         header.getChildren().addAll(titleBox, spacer, reservationComboBox, addActivityButton);
@@ -229,11 +222,11 @@ public class ItinerariesView {
         return activityRow;
     }
 
-    private void showAddActivityDialog(Reservation reservation) {
+    private void showAddActivityDialog() {
         Dialog<ButtonType> dialog = new Dialog<>();
         dialog.initOwner(this.stage);
         dialog.setTitle("Adicionar Atividade ao Itinerário");
-        dialog.setHeaderText("Preencha as informações da nova atividade para a reserva RES-" + reservation.getId());
+        dialog.setHeaderText("Selecione a reserva e preencha os detalhes da atividade");
 
         dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
 
@@ -242,6 +235,20 @@ public class ItinerariesView {
         grid.setVgap(10);
         grid.setPadding(new Insets(20, 150, 10, 10));
 
+        ComboBox<Reservation> dialogResCombo = new ComboBox<>();
+        dialogResCombo.setPromptText("Selecione a Reserva");
+        dialogResCombo.setItems(FXCollections.observableArrayList(reservationDAO.getAllReservations()));
+        dialogResCombo.setConverter(new StringConverter<>() {
+            @Override
+            public String toString(Reservation reservation) {
+                return reservation == null ? "" : "RES-" + reservation.getId() + " - " + reservation.getClient().getName();
+            }
+            @Override
+            public Reservation fromString(String string) { return null; }
+        });
+        if (reservationComboBox.getValue() != null) {
+            dialogResCombo.setValue(reservationComboBox.getValue());
+        }
         DatePicker datePicker = new DatePicker(LocalDate.now());
         TextField timeField = new TextField();
         timeField.setPromptText("HH:MM");
@@ -251,32 +258,44 @@ public class ItinerariesView {
         typeComboBox.setItems(FXCollections.observableArrayList("Flight", "Accommodation", "Tour", "Other"));
         typeComboBox.setValue("Other");
 
-        grid.add(new Label("Data:"), 0, 0);
-        grid.add(datePicker, 1, 0);
-        grid.add(new Label("Horário:"), 0, 1);
-        grid.add(timeField, 1, 1);
-        grid.add(new Label("Tipo:"), 0, 2);
-        grid.add(typeComboBox, 1, 2);
-        grid.add(new Label("Título:"), 0, 3);
-        grid.add(titleField, 1, 3);
-        grid.add(new Label("Descrição:"), 0, 4);
-        grid.add(descriptionArea, 1, 4);
+        grid.add(new Label("Reserva:"), 0, 0);
+        grid.add(dialogResCombo, 1, 0);
+        grid.add(new Label("Data:"), 0, 1);
+        grid.add(datePicker, 1, 1);
+        grid.add(new Label("Horário:"), 0, 2);
+        grid.add(timeField, 1, 2);
+        grid.add(new Label("Tipo:"), 0, 3);
+        grid.add(typeComboBox, 1, 3);
+        grid.add(new Label("Título:"), 0, 4);
+        grid.add(titleField, 1, 4);
+        grid.add(new Label("Descrição:"), 0, 5);
+        grid.add(descriptionArea, 1, 5);
 
         dialog.getDialogPane().setContent(grid);
 
         dialog.setResultConverter(dialogButton -> {
             if (dialogButton == ButtonType.OK) {
+                Reservation selectedReservation = dialogResCombo.getValue();
+                if (selectedReservation == null) {
+                    Alert alert = new Alert(Alert.AlertType.WARNING, "É obrigatório selecionar uma reserva.");
+                    alert.initOwner(stage);
+                    alert.showAndWait();
+                    return null;
+                }
                 try {
                     LocalTime time = LocalTime.parse(timeField.getText());
                     itineraryDAO.addActivityToItinerary(
-                            reservation.getId(),
+                            selectedReservation.getId(),
                             datePicker.getValue(),
                             time,
                             titleField.getText(),
                             descriptionArea.getText(),
                             typeComboBox.getValue()
                     );
-                    loadItinerary(reservation);
+                    if (reservationComboBox.getValue() != null &&
+                            reservationComboBox.getValue().getId() == selectedReservation.getId()) {
+                        loadItinerary(selectedReservation);
+                    }
                 } catch (Exception e) {
                     Alert alert = new Alert(Alert.AlertType.ERROR, "Formato de hora inválido. Use HH:MM.");
                     alert.initOwner(stage);
