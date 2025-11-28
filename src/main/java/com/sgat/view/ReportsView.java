@@ -69,7 +69,7 @@ public class ReportsView {
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
         // Seletor de Ano
-        cmbYearSelector = new ComboBox<>(FXCollections.observableArrayList("2025", "2024", "2023"));
+        cmbYearSelector = new ComboBox<>(FXCollections.observableArrayList("2027", "2026","2025", "2024", "2023"));
         cmbYearSelector.setValue("2025");
         String comboStyle = "-fx-border-color: #E0E0E0; -fx-border-width: 1; -fx-border-radius: 8; -fx-padding: 4 8; -fx-background-color: white; -fx-font-weight: bold; -fx-cursor: hand;";
         cmbYearSelector.setStyle(comboStyle);
