@@ -29,10 +29,16 @@
     -fx-background-radius: 8;
     -fx-padding: 8 16;
     -fx-cursor: hand;
+    -fx-font-size: 14px;
+    -fx-pref-height: 40px;
 }
 
 .add-button .icon-svg {
     -fx-fill: white;
+}
+
+.add-button .icon {
+    -fx-fill: white !important;
 }
 
 .add-button:hover {
