@@ -1,14 +1,35 @@
 package com.sgat.view;
 
-import javafx.geometry.Insets;
+import java.util.List;
+
+import org.kordamp.ikonli.javafx.FontIcon;
+import org.kordamp.ikonli.materialdesign2.MaterialDesignA;
+import org.kordamp.ikonli.materialdesign2.MaterialDesignC;
+import org.kordamp.ikonli.materialdesign2.MaterialDesignM;
+import org.kordamp.ikonli.materialdesign2.MaterialDesignP;
+
+import com.sgat.controller.DashboardController;
+import com.sgat.controller.DashboardController.PacotePopularDTO;
+import com.sgat.controller.DashboardController.ReservaRecentesDTO;
+
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
-import javafx.scene.layout.*;
-import org.kordamp.ikonli.javafx.FontIcon;
-import org.kordamp.ikonli.materialdesign2.*;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.ColumnConstraints;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
 
 public class DashboardView {
+
+    private final DashboardController controller;
+
+    public DashboardView(DashboardController controller) {
+        this.controller = controller;
+    }
 
     public Node getView() {
         VBox dashboardPane = new VBox();
@@ -21,13 +42,12 @@ public class DashboardView {
         Label subtitle = new Label("Visão geral do sistema de gestão.");
         subtitle.getStyleClass().add("dashboard-subtitle");
 
-        // Grade de Estatísticas - Convertido para GridPane para responsividade
+        // Grade de Estatísticas
         GridPane statsGrid = new GridPane();
         statsGrid.getStyleClass().add("stats-grid");
         statsGrid.setHgap(16);
         statsGrid.setVgap(16);
 
-        // Configura 4 colunas com largura percentual igual
         for (int i = 0; i < 4; i++) {
             ColumnConstraints col = new ColumnConstraints();
             col.setPercentWidth(25);
@@ -35,10 +55,16 @@ public class DashboardView {
             statsGrid.getColumnConstraints().add(col);
         }
 
-        Node statCard1 = createStatCard("Pacotes Ativos", "78", "+5.2% vs. mês passado", new FontIcon(MaterialDesignP.PACKAGE_VARIANT_CLOSED));
-        Node statCard2 = createStatCard("Clientes Cadastrados", "1,204", "+120 novos este mês", new FontIcon(MaterialDesignA.ACCOUNT_GROUP_OUTLINE));
-        Node statCard3 = createStatCard("Reservas Pendentes", "32", "-10% vs. semana passada", new FontIcon(MaterialDesignC.CALENDAR_CLOCK));
-        Node statCard4 = createStatCard("Receita (Mês)", "R$ 45.8k", "+15% vs. mês passado", new FontIcon(MaterialDesignC.CASH));
+        // Dados reais
+        int totalPacotes = safeInt(() -> controller.getTotalPacotes());
+        int totalClientes = safeInt(() -> controller.getTotalClientes());
+        int reservasPendentes = safeInt(() -> controller.getReservasPendentes());
+        double receitaMes = safeDouble(() -> controller.getReceitaDoMes());
+
+        Node statCard1 = createStatCard("Pacotes Ativos", String.valueOf(totalPacotes), "", new FontIcon(MaterialDesignP.PACKAGE_VARIANT_CLOSED));
+        Node statCard2 = createStatCard("Clientes Cadastrados", String.valueOf(totalClientes), "", new FontIcon(MaterialDesignA.ACCOUNT_GROUP_OUTLINE));
+        Node statCard3 = createStatCard("Reservas Pendentes", String.valueOf(reservasPendentes), "", new FontIcon(MaterialDesignC.CALENDAR_CLOCK));
+        Node statCard4 = createStatCard("Receita (Mês)", "R$ " + receitaMes, "", new FontIcon(MaterialDesignC.CASH));
 
         statsGrid.add(statCard1, 0, 0);
         statsGrid.add(statCard2, 1, 0);
@@ -49,13 +75,10 @@ public class DashboardView {
         GridPane infoGrid = new GridPane();
         infoGrid.getStyleClass().add("info-grid");
 
-        // Configura 2 colunas com largura percentual igual
         ColumnConstraints col1 = new ColumnConstraints();
         col1.setPercentWidth(50);
-        col1.setHgrow(Priority.ALWAYS);
         ColumnConstraints col2 = new ColumnConstraints();
         col2.setPercentWidth(50);
-        col2.setHgrow(Priority.ALWAYS);
         infoGrid.getColumnConstraints().addAll(col1, col2);
 
         Node reservationsCard = createRecentReservationsCard();
@@ -68,10 +91,14 @@ public class DashboardView {
         return dashboardPane;
     }
 
+    // -------------------------
+    // CARDS
+    // -------------------------
+
     private Node createStatCard(String title, String value, String description, Node icon) {
         VBox card = new VBox();
         card.getStyleClass().add("stat-card");
-        GridPane.setHgrow(card, Priority.ALWAYS); // Permite que o card cresça horizontalmente
+        GridPane.setHgrow(card, Priority.ALWAYS);
 
         HBox header = new HBox();
         header.getStyleClass().add("stat-card-header");
@@ -80,9 +107,7 @@ public class DashboardView {
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
         icon.getStyleClass().add("icon-svg");
-        if (icon instanceof FontIcon) {
-            ((FontIcon) icon).setIconSize(24);
-        }
+        ((FontIcon) icon).setIconSize(24);
         header.getChildren().addAll(titleLabel, spacer, icon);
 
         Label valueLabel = new Label(value);
@@ -98,7 +123,6 @@ public class DashboardView {
     private Node createRecentReservationsCard() {
         VBox card = new VBox();
         card.getStyleClass().add("info-card");
-        GridPane.setHgrow(card, Priority.ALWAYS); // Permite que o card cresça horizontalmente
 
         Label title = new Label("Reservas Recentes");
         title.getStyleClass().add("info-card-title");
@@ -106,12 +130,17 @@ public class DashboardView {
         subtitle.getStyleClass().add("info-card-subtitle");
 
         VBox list = new VBox();
-        list.getChildren().addAll(
-            createReservationItem("Ana Clara", "Pacote Férias em Cancún", "20/10/2025", "Confirmada"),
-            createReservationItem("Bruno Costa", "Aventura na Patagônia", "18/10/2025", "Pendente"),
-            createReservationItem("Carlos Dias", "Cruzeiro pelo Caribe", "15/10/2025", "Confirmada"),
-            createReservationItem("Diana Souza", "Tour pela Europa Imperial", "14/10/2025", "Confirmada")
-        );
+
+        List<ReservaRecentesDTO> reservas = safeList(() -> controller.getReservasRecentes());
+
+        for (ReservaRecentesDTO r : reservas) {
+            list.getChildren().add(createReservationItem(
+                    r.cliente,
+                    r.pacote,
+                    r.data.toString(),
+                    r.status
+            ));
+        }
 
         card.getChildren().addAll(title, subtitle, list);
         return card;
@@ -133,7 +162,12 @@ public class DashboardView {
         Label dateLabel = new Label(date);
         dateLabel.getStyleClass().add("list-item-date");
         Label statusLabel = new Label(status);
-        statusLabel.getStyleClass().addAll("status-label", status.equalsIgnoreCase("Confirmada") ? "status-confirmada" : "status-pendente");
+        statusLabel.getStyleClass().add("status-label");
+        if (status.equalsIgnoreCase("Confirmada")) {
+            statusLabel.getStyleClass().add("status-confirmada");
+        } else {
+            statusLabel.getStyleClass().add("status-pendente");
+        }
         rightBox.getChildren().addAll(dateLabel, statusLabel);
 
         item.setLeft(leftBox);
@@ -144,7 +178,6 @@ public class DashboardView {
     private Node createPopularPackagesCard() {
         VBox card = new VBox();
         card.getStyleClass().add("info-card");
-        GridPane.setHgrow(card, Priority.ALWAYS); // Permite que o card cresça horizontalmente
 
         Label title = new Label("Pacotes Mais Populares");
         title.getStyleClass().add("info-card-title");
@@ -152,11 +185,17 @@ public class DashboardView {
         subtitle.getStyleClass().add("info-card-subtitle");
 
         VBox list = new VBox();
-        list.getChildren().addAll(
-            createPackageItem("Tour pela Europa Imperial", 42, "R$ 120.5k", new FontIcon(MaterialDesignM.MAP_MARKER)),
-            createPackageItem("Aventura na Patagônia", 35, "R$ 95.2k", new FontIcon(MaterialDesignM.MAP_MARKER)),
-            createPackageItem("Férias em Cancún", 28, "R$ 88.9k", new FontIcon(MaterialDesignM.MAP_MARKER))
-        );
+
+        List<PacotePopularDTO> pacotes = safeList(() -> controller.getPacotesMaisPopulares());
+
+        for (PacotePopularDTO p : pacotes) {
+            list.getChildren().add(createPackageItem(
+                    p.nome,
+                    p.vendas,
+                    "R$ " + p.receita,
+                    new FontIcon(MaterialDesignM.MAP_MARKER)
+            ));
+        }
 
         card.getChildren().addAll(title, subtitle, list);
         return card;
@@ -169,10 +208,7 @@ public class DashboardView {
         HBox leftBox = new HBox(12);
         leftBox.setAlignment(Pos.CENTER_LEFT);
 
-        icon.getStyleClass().add("icon-svg");
-        if (icon instanceof FontIcon) {
-            ((FontIcon) icon).setIconSize(20);
-        }
+        ((FontIcon) icon).setIconSize(20);
 
         VBox infoBox = new VBox(2);
         Label nameLabel = new Label(name);
@@ -185,10 +221,30 @@ public class DashboardView {
 
         Label revenueLabel = new Label(revenue);
         revenueLabel.getStyleClass().add("list-item-revenue");
-        BorderPane.setAlignment(revenueLabel, Pos.CENTER_RIGHT);
 
         item.setLeft(leftBox);
         item.setRight(revenueLabel);
+
         return item;
     }
+
+    // -----------------------------
+    // FUNÇÕES SEGURAS (evitam crash)
+    // -----------------------------
+
+    private int safeInt(SqlIntSupplier s) {
+        try { return s.get(); } catch (Exception e) { return 0; }
+    }
+
+    private double safeDouble(SqlDoubleSupplier s) {
+        try { return s.get(); } catch (Exception e) { return 0.0; }
+    }
+
+    private <T> List<T> safeList(SqlListSupplier<T> s) {
+        try { return s.get(); } catch (Exception e) { return List.of(); }
+    }
+
+    interface SqlIntSupplier { int get() throws Exception; }
+    interface SqlDoubleSupplier { double get() throws Exception; }
+    interface SqlListSupplier<T> { List<T> get() throws Exception; }
 }
