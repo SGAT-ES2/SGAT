@@ -225,6 +225,7 @@ public class MainLayout {
         HBox header = new HBox();
         header.getStyleClass().add("main-header");
         Button trigger = new Button("☰");
+        trigger.getStyleClass().add("sidebar-trigger-button");
         trigger.setOnAction(e -> sidebarCollapsed.set(!sidebarCollapsed.get()));
         header.getChildren().add(trigger);
         return header;

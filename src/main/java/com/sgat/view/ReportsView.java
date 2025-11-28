@@ -29,6 +29,7 @@ public class ReportsView {
 
     private ComboBox<String> cmbYearSelector;
     private ComboBox<PdfExportMode> cmbExportMode;
+    private final Label statusLabel = new Label(); // New status label
 
     public ReportsView() {
         view = new VBox(24);
@@ -88,8 +89,12 @@ public class ReportsView {
         Button exportButton = new Button("Exportar PDF");
         exportButton.getStyleClass().add("export-button");
         exportButton.setOnAction(event -> { if (controller != null) controller.exportPDF(); });
+        
+        statusLabel.getStyleClass().add("status-label"); // Apply a style if needed
+        statusLabel.setTextFill(Color.web("#343A40")); // Default color
+        statusLabel.setPadding(new Insets(0, 0, 0, 10)); // Add some padding
 
-        header.getChildren().addAll(titleBox, spacer, cmbYearSelector, cmbExportMode, exportButton);
+        header.getChildren().addAll(titleBox, spacer, cmbYearSelector, cmbExportMode, exportButton, statusLabel);
         return header;
     }
 
@@ -161,6 +166,10 @@ public class ReportsView {
     public void setController(ReportsController controller) { this.controller = controller; }
     public String getSelectedYear() { return cmbYearSelector.getValue(); }
     public PdfExportMode getSelectedExportMode() { return cmbExportMode.getValue(); }
+
+    public void updateStatus(String message) {
+        statusLabel.setText(message);
+    }
 
     // --- SEÇÃO DE DETALHES (FIXA POR ENQUANTO) ---
     private Node createDetailsSection() {

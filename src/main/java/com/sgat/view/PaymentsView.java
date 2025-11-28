@@ -8,6 +8,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
@@ -29,10 +30,10 @@ public class PaymentsView {
     private Label receivedValueLabel;
     private Label pendingValueLabel;
 
-    // --- LARGURAS REFINADAS (Tornando a tabela mais compacta e coesa) ---
+    // Constantes de largura
     private static final double COL_RES_WIDTH = -1;
-    private static final double COL_VAL_WIDTH = 130; // Reduzido de 140 para 130 (aproxima as colunas)
-    private static final double COL_MET_WIDTH = 140; // Reduzido de 150 para 140
+    private static final double COL_VAL_WIDTH = 130;
+    private static final double COL_MET_WIDTH = 140;
     private static final double COL_DAT_WIDTH = 110;
     private static final double COL_STA_WIDTH = 100;
     private static final double COLUMN_GAP = 10;
@@ -105,18 +106,17 @@ public class PaymentsView {
     private HBox createHistoryHeader() {
         HBox header = new HBox(COLUMN_GAP);
         header.getStyleClass().add("column-header-background");
-        header.setPadding(new Insets(10, 16, 10, 16));
+
+        // CORREÇÃO 1 (Scrollbar): Aumentei o padding da direita de 16 para 32
+        header.setPadding(new Insets(10, 32, 10, 16));
+
         header.setAlignment(Pos.CENTER_LEFT);
 
         Label resLabel = createHeaderLabel("Reserva", Pos.CENTER_LEFT, COL_RES_WIDTH);
         Label totalLabel = createHeaderLabel("Valor Total", Pos.CENTER_RIGHT, COL_VAL_WIDTH);
         Label pagoLabel = createHeaderLabel("Valor Pago", Pos.CENTER_RIGHT, COL_VAL_WIDTH);
         Label pendenteLabel = createHeaderLabel("Pendente", Pos.CENTER_RIGHT, COL_VAL_WIDTH);
-
-        // MUDANÇA PRINCIPAL: Método agora é CENTRALIZADO
-        // Isso remove a estranheza visual entre o rótulo e o dado
         Label metodoLabel = createHeaderLabel("Método", Pos.CENTER, COL_MET_WIDTH);
-
         Label dataLabel = createHeaderLabel("Data", Pos.CENTER, COL_DAT_WIDTH);
         Label statusLabel = createHeaderLabel("Status", Pos.CENTER, COL_STA_WIDTH);
 
@@ -146,16 +146,24 @@ public class PaymentsView {
         return label;
     }
 
-    // --- LINHA ---
+    // --- LINHA DA TABELA ---
     private Node createHistoryRow(Reservation reservation, String total, String paid, String pending, String method, String date, String status) {
         HBox row = new HBox(COLUMN_GAP);
         row.getStyleClass().add("list-item");
-        row.setPadding(new Insets(12, 16, 12, 16));
+
+        // CORREÇÃO 1 (Scrollbar): Aumentei o padding da direita para 32 aqui também
+        row.setPadding(new Insets(12, 32, 12, 16));
+
         row.getStyleClass().add("clickable-list-item");
         row.setAlignment(Pos.CENTER_LEFT);
 
-        // Coluna Reserva (Elástica)
+        // --- Coluna Reserva ---
         VBox resBox = new VBox(-2);
+
+        // CORREÇÃO 2 (Alinhamento Reserva): Adicionei um padding leve à esquerda (5px)
+        // Isso empurra o nome "Rafael..." para alinhar perfeitamente com o título "Reserva"
+        resBox.setPadding(new Insets(0, 0, 0, 5));
+
         Label lblRes = new Label("RES-" + reservation.getId());
         lblRes.getStyleClass().add("list-item-package-name");
         Label lblClient = new Label(reservation.getClient().getName());
@@ -163,19 +171,16 @@ public class PaymentsView {
         resBox.getChildren().addAll(lblRes, lblClient);
         resBox.setAlignment(Pos.CENTER_LEFT);
         resBox.setMaxWidth(Double.MAX_VALUE);
+
         HBox.setHgrow(resBox, Priority.ALWAYS);
 
-        // Colunas Fixas
+        // --- Outras Colunas ---
         Label lblTotal = createAlignedDataLabel(total, "#666666", Pos.CENTER_RIGHT, COL_VAL_WIDTH);
         Label lblPaid = createAlignedDataLabel(paid, "#388e3c", Pos.CENTER_RIGHT, COL_VAL_WIDTH);
         Label lblPending = createAlignedDataLabel(pending, "#ef6c00", Pos.CENTER_RIGHT, COL_VAL_WIDTH);
-
-        // MUDANÇA PRINCIPAL: Centralizar o dado do Método
         Label lblMethod = createAlignedDataLabel(method, "#424242", Pos.CENTER, COL_MET_WIDTH);
-
         Label lblDate = createAlignedDataLabel(date, "#666666", Pos.CENTER, COL_DAT_WIDTH);
 
-        // Status
         Label lblStatus = new Label(status);
         lblStatus.getStyleClass().add("status-label");
         lblStatus.setMinWidth(COL_STA_WIDTH);
@@ -211,7 +216,7 @@ public class PaymentsView {
         return label;
     }
 
-    // --- RESTANTE DOS MÉTODOS (Mantidos iguais) ---
+    // --- MÉTODOS GERAIS (Inalterados) ---
     private Node createHeader() {
         HBox header = new HBox(12);
         header.setAlignment(Pos.CENTER_LEFT);
@@ -287,8 +292,14 @@ public class PaymentsView {
         HBox headerRow = createHistoryHeader();
         tableBody = new VBox(0);
         tableBody.getStyleClass().add("table-view");
-        VBox.setVgrow(tableBody, Priority.ALWAYS);
-        card.getChildren().addAll(titleBox, headerRow, tableBody);
+
+        ScrollPane scrollPane = new ScrollPane(tableBody);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        scrollPane.setStyle("-fx-background-color: transparent; -fx-background: transparent; -fx-padding: 0;");
+        VBox.setVgrow(scrollPane, Priority.ALWAYS);
+
+        card.getChildren().addAll(titleBox, headerRow, scrollPane);
         return card;
     }
 }

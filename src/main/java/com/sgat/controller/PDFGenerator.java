@@ -32,7 +32,7 @@ public class PDFGenerator {
         }
     }
 
-    public static void generatePDF(ReportData data, PdfExportMode mode) throws IOException {
+    public static File generatePDF(ReportData data, PdfExportMode mode) throws IOException {
         boolean includeText = (mode == PdfExportMode.TEXT || mode == PdfExportMode.COMPLETE);
         boolean includeGraphics = (mode == PdfExportMode.GRAPHICS || mode == PdfExportMode.COMPLETE);
 
@@ -133,14 +133,8 @@ public class PDFGenerator {
         }
 
         System.out.println("PDF gerado em: " + output.getAbsolutePath());
+        return output; // Return the generated file
 
-        try {
-            if (Desktop.isDesktopSupported()) {
-                Desktop.getDesktop().open(output);
-            }
-        } catch (Exception e) {
-            System.err.println("Erro ao abrir PDF: " + e.getMessage());
-        }
     }
 
     private static void drawMetricCard(PDPageContentStream cs, float x, float y, float w, float h, String title, String value) throws IOException {
