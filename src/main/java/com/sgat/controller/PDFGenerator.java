@@ -13,31 +13,42 @@ import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 
-/**
- * Gerador de PDF avançado (Modelo B - Analítico).
- * - Gera 2 páginas:
- *   Página 1: Capa + métricas + gráfico de linha (vendas mensais)
- *   Página 2: Gráfico de barras (receita por pacote), gráfico de pizza (participação)
- *
- * Observação: utiliza dados mockados por mês / pacotes baseados no ano fornecido.
- */
 public class PDFGenerator {
 
-    public static void generatePDF(ReportData data) throws IOException {
+    public enum PdfExportMode {
+        TEXT("Apenas Texto"),
+        GRAPHICS("Apenas Gráficos"),
+        COMPLETE("Relatório Completo");
+
+        private final String label;
+
+        PdfExportMode(String label) {
+            this.label = label;
+        }
+
+        @Override
+        public String toString() {
+            return label;
+        }
+    }
+
+    public static void generatePDF(ReportData data, PdfExportMode mode) throws IOException {
+        boolean includeText = (mode == PdfExportMode.TEXT || mode == PdfExportMode.COMPLETE);
+        boolean includeGraphics = (mode == PdfExportMode.GRAPHICS || mode == PdfExportMode.COMPLETE);
+
         String fileName = "Relatorio_Analitico_" + data.year + ".pdf";
         File output = new File(fileName);
 
         try (PDDocument document = new PDDocument()) {
 
-            // --- Página 1: Capa + Métricas + Line Chart ---
             PDPage page1 = new PDPage(PDRectangle.LETTER);
             document.addPage(page1);
             try (PDPageContentStream cs = new PDPageContentStream(document, page1)) {
                 float margin = 50;
                 float width = page1.getMediaBox().getWidth();
-                float cursorY = page1.getMediaBox().getHeight() - margin;
+                float height = page1.getMediaBox().getHeight();
+                float cursorY = height - margin;
 
-                // Título
                 cs.beginText();
                 cs.setFont(PDType1Font.HELVETICA_BOLD, 22);
                 cs.newLineAtOffset(margin, cursorY);
@@ -45,42 +56,40 @@ public class PDFGenerator {
                 cs.endText();
                 cursorY -= 30;
 
-                // Subtítulo / data de geração
                 cs.beginText();
                 cs.setFont(PDType1Font.HELVETICA_OBLIQUE, 10);
                 cs.newLineAtOffset(margin, cursorY);
-                cs.showText("Gerado em " + LocalDate.now());
+                cs.showText("Gerado em " + LocalDate.now() + " (Modo: " + mode.toString() + ")");
                 cs.endText();
                 cursorY -= 25;
 
-                // Linha separadora
                 cs.setStrokingColor(180, 180, 180);
                 cs.moveTo(margin, cursorY);
                 cs.lineTo(width - margin, cursorY);
                 cs.stroke();
                 cursorY -= 20;
 
-                // Métricas (cards simples)
-                float cardWidth = (width - margin * 2 - 20) / 3f;
-                float cardHeight = 50;
-                float cardY = cursorY - cardHeight;
+                if (includeText) {
+                    float cardWidth = (width - margin * 2 - 20) / 3f;
+                    float cardHeight = 50;
+                    float cardY = cursorY - cardHeight;
 
-                drawMetricCard(cs, margin, cardY, cardWidth, cardHeight, "Total de Reservas", data.totalReservas);
-                drawMetricCard(cs, margin + cardWidth + 10, cardY, cardWidth, cardHeight, "Receita Total", data.receitaTotal);
-                drawMetricCard(cs, margin + (cardWidth + 10) * 2, cardY, cardWidth, cardHeight, "Novos Clientes", data.novosClientes);
+                    drawMetricCard(cs, margin, cardY, cardWidth, cardHeight, "Total de Reservas", data.totalReservas);
+                    drawMetricCard(cs, margin + cardWidth + 10, cardY, cardWidth, cardHeight, "Receita Total", data.receitaTotal);
+                    drawMetricCard(cs, margin + (cardWidth + 10) * 2, cardY, cardWidth, cardHeight, "Novos Clientes", data.novosClientes);
 
-                cursorY = cardY - 40;
+                    cursorY = cardY - 40;
+                } else {
+                    cursorY -= 60;
+                }
 
-                // Gráfico de linhas: Vendas mensais (mock)
-                double[] monthlySales = mockMonthlySales(data.year); // 12 valores
-                drawLineChart(cs, margin, cursorY - 220, width - margin * 2, 200, monthlySales, "Vendas Mensais (unidades)");
-
-                // Eixo X labels (meses)
-                drawMonthLabels(cs, margin, cursorY - 230, width - margin * 2);
-
+                if (includeGraphics) {
+                    double[] monthlySales = mockMonthlySales(data.year);
+                    drawLineChart(cs, margin, cursorY - 220, width - margin * 2, 200, monthlySales, "Vendas Mensais (unidades)");
+                    drawMonthLabels(cs, margin, cursorY - 230, width - margin * 2);
+                }
             }
 
-            // --- Página 2: Bar Chart + Pie Chart + Tabelas resumidas ---
             PDPage page2 = new PDPage(PDRectangle.LETTER);
             document.addPage(page2);
             try (PDPageContentStream cs = new PDPageContentStream(document, page2)) {
@@ -88,70 +97,62 @@ public class PDFGenerator {
                 float width = page2.getMediaBox().getWidth();
                 float cursorY = page2.getMediaBox().getHeight() - margin;
 
-                // Título da página
                 cs.beginText();
                 cs.setFont(PDType1Font.HELVETICA_BOLD, 16);
                 cs.newLineAtOffset(margin, cursorY);
                 cs.showText("Análises Detalhadas");
                 cs.endText();
-                cursorY -= 20;
+                cursorY -= 40;
 
-                // Mock: receita por pacote (bar chart)
                 List<String> pkgNames = Arrays.asList("Paris Romântica", "Caribe Premium", "Amazônia", "Europa Clássica", "Ásia Exótica");
-                double[] pkgRevenue = mockPackageRevenue(data.year); // 5 valores
+                double[] pkgRevenue = mockPackageRevenue(data.year);
 
-                // Bar chart
-                drawBarChart(cs, margin, cursorY - 220, width - margin * 2, 200, pkgRevenue, pkgNames, "Receita por Pacote (R$)");
+                float currentY = cursorY;
 
-                // Move cursor para a direita para desenhar pie chart
-                float pieX = margin + (width - margin * 2) - 260f;
-                float pieY = cursorY - 260f;
-                double[] shares = computePercentages(pkgRevenue);
-                drawPieChart(cs, pieX, pieY, 120, shares, pkgNames);
+                if (includeGraphics) {
+                    drawBarChart(cs, margin, currentY - 200, width - margin * 2, 200, pkgRevenue, pkgNames, "Receita por Pacote (R$)");
 
-                // Tabela resumida (pequena)
-                float tableY = cursorY - 240f - 220f;
-                drawSimpleTable(cs, margin, tableY, pkgNames, pkgRevenue);
+                    currentY -= 250;
 
+                    float pieRadius = 100;
+                    float pieX = width / 2;
+                    float pieY = currentY - pieRadius;
+
+                    double[] shares = computePercentages(pkgRevenue);
+                    drawPieChart(cs, pieX, pieY, pieRadius, shares, pkgNames);
+
+                    currentY -= (pieRadius * 2) + 40;
+                }
+
+                if (includeText) {
+                    drawSimpleTable(cs, margin, currentY, pkgNames, pkgRevenue);
+                }
             }
 
-            // Salva e fecha
             document.save(output);
         }
 
         System.out.println("PDF gerado em: " + output.getAbsolutePath());
 
-        // Abre automaticamente
         try {
             if (Desktop.isDesktopSupported()) {
                 Desktop.getDesktop().open(output);
-            } else {
-                System.out.println("Abertura automática não suportada no sistema.");
             }
         } catch (Exception e) {
-            System.err.println("Erro ao tentar abrir o PDF: " + e.getMessage());
+            System.err.println("Erro ao abrir PDF: " + e.getMessage());
         }
     }
 
-    // -------------------------
-    // Helpers & Draw routines
-    // -------------------------
-
     private static void drawMetricCard(PDPageContentStream cs, float x, float y, float w, float h, String title, String value) throws IOException {
-        // card background
         cs.setNonStrokingColor(245, 245, 245);
         cs.addRect(x, y, w, h);
         cs.fill();
         cs.setNonStrokingColor(0, 0, 0);
-
-        // title
         cs.beginText();
         cs.setFont(PDType1Font.HELVETICA_BOLD, 10);
         cs.newLineAtOffset(x + 8, y + h - 14);
         cs.showText(title);
         cs.endText();
-
-        // value
         cs.beginText();
         cs.setFont(PDType1Font.HELVETICA_BOLD, 14);
         cs.newLineAtOffset(x + 8, y + 8);
@@ -160,27 +161,19 @@ public class PDFGenerator {
     }
 
     private static void drawLineChart(PDPageContentStream cs, float x, float y, float w, float h, double[] values, String title) throws IOException {
-        // Border
         cs.setStrokingColor(200, 200, 200);
         cs.addRect(x, y, w, h);
         cs.stroke();
-
-        // title
         cs.beginText();
         cs.setFont(PDType1Font.HELVETICA_BOLD, 12);
         cs.newLineAtOffset(x + 4, y + h + 6);
         cs.showText(title);
         cs.endText();
-
-        // compute scale
         double max = Arrays.stream(values).max().orElse(1);
         double min = Arrays.stream(values).min().orElse(0);
         double range = Math.max(1, max - min);
-
         int n = values.length;
         double stepX = w / (n - 1);
-
-        // draw grid lines and y-labels
         int gridLines = 4;
         cs.setStrokingColor(230, 230, 230);
         for (int i = 0; i <= gridLines; i++) {
@@ -189,9 +182,7 @@ public class PDFGenerator {
             cs.lineTo(x + w, yy);
             cs.stroke();
         }
-
-        // draw polyline
-        cs.setStrokingColor(30, 120, 210); // blue line
+        cs.setStrokingColor(30, 120, 210);
         cs.setLineWidth(2f);
         for (int i = 0; i < n; i++) {
             float px = (float) (x + stepX * i);
@@ -199,8 +190,6 @@ public class PDFGenerator {
             if (i == 0) cs.moveTo(px, py); else cs.lineTo(px, py);
         }
         cs.stroke();
-
-        // draw points
         cs.setNonStrokingColor(30, 120, 210);
         for (int i = 0; i < n; i++) {
             float px = (float) (x + stepX * i);
@@ -208,8 +197,6 @@ public class PDFGenerator {
             cs.addRect(px - 2, py - 2, 4, 4);
             cs.fill();
         }
-
-        // reset color
         cs.setNonStrokingColor(0, 0, 0);
     }
 
@@ -228,7 +215,6 @@ public class PDFGenerator {
     }
 
     private static void drawBarChart(PDPageContentStream cs, float x, float y, float w, float h, double[] values, List<String> labels, String title) throws IOException {
-        // border and title
         cs.setStrokingColor(200, 200, 200);
         cs.addRect(x, y, w, h);
         cs.stroke();
@@ -237,55 +223,42 @@ public class PDFGenerator {
         cs.newLineAtOffset(x + 4, y + h + 6);
         cs.showText(title);
         cs.endText();
-
         int n = values.length;
         double max = Arrays.stream(values).max().orElse(1);
-        float barAreaWidth = w - 60; // leave some space for labels
+        float barAreaWidth = w - 60;
         float barWidth = barAreaWidth / n * 0.6f;
         float gap = (barAreaWidth - n * barWidth) / (n - 1);
-
         float startX = x + 8;
         float baseY = y + 20;
-
-        // bars
         for (int i = 0; i < n; i++) {
             float bx = startX + i * (barWidth + gap);
             float bh = (float) ((values[i] / max) * (h - 60));
-            cs.setNonStrokingColor(60, 180, 90); // green bars
+            cs.setNonStrokingColor(60, 180, 90);
             cs.addRect(bx, baseY, barWidth, bh);
             cs.fill();
-
-            // label
             cs.beginText();
             cs.setFont(PDType1Font.HELVETICA, 8);
             cs.newLineAtOffset(bx, baseY - 10);
             cs.showText(truncate(labels.get(i), 12));
             cs.endText();
-
-            // value text
             cs.beginText();
             cs.setFont(PDType1Font.HELVETICA_BOLD, 9);
             cs.newLineAtOffset(bx, baseY + bh + 4);
             cs.showText(String.format("R$ %.0f", values[i]));
             cs.endText();
         }
-
         cs.setNonStrokingColor(0, 0, 0);
     }
 
     private static void drawPieChart(PDPageContentStream cs, float centerX, float centerY, float radius, double[] shares, List<String> labels) throws IOException {
-        // shares are percentages summing to 100
         float startAngle = 0f;
-        java.util.Random rand = new java.util.Random(0); // deterministic colors
+        java.util.Random rand = new java.util.Random(0);
         for (int i = 0; i < shares.length; i++) {
             float sweep = (float) (shares[i] / 100.0 * 360.0);
-            // color
             int r = 80 + rand.nextInt(160);
             int g = 80 + rand.nextInt(160);
             int b = 80 + rand.nextInt(160);
             cs.setNonStrokingColor(r, g, b);
-
-            // approximate sector by polygon
             int steps = Math.max(8, Math.round(Math.abs(sweep) / 5f));
             double startRad = Math.toRadians(startAngle);
             double sweepRad = Math.toRadians(sweep);
@@ -298,8 +271,6 @@ public class PDFGenerator {
             }
             cs.closePath();
             cs.fill();
-
-            // label: compute middle angle
             double midAngle = Math.toRadians(startAngle + sweep / 2.0);
             float lx = (float) (centerX + (radius + 20) * Math.cos(midAngle));
             float ly = (float) (centerY + (radius + 20) * Math.sin(midAngle));
@@ -309,7 +280,6 @@ public class PDFGenerator {
             cs.newLineAtOffset(lx - 10, ly - 4);
             cs.showText(truncate(labels.get(i), 12) + " (" + Math.round(shares[i]) + "%)");
             cs.endText();
-
             startAngle += sweep;
         }
         cs.setNonStrokingColor(0, 0, 0);
@@ -321,7 +291,6 @@ public class PDFGenerator {
         cs.newLineAtOffset(x, y);
         cs.showText("Tabela: Receita por Pacote");
         cs.endText();
-
         float rowY = y - 16;
         cs.setFont(PDType1Font.HELVETICA, 10);
         for (int i = 0; i < pkgNames.size(); i++) {
@@ -332,11 +301,7 @@ public class PDFGenerator {
         }
     }
 
-    // -------------------------
-    // Mock data generators (determinísticos por ano)
-    // -------------------------
     private static double[] mockMonthlySales(String year) {
-        // deterministically create 12 monthly values based on year hash
         int base = Math.abs(year.hashCode()) % 50 + 20;
         double[] v = new double[12];
         for (int i = 0; i < 12; i++) {

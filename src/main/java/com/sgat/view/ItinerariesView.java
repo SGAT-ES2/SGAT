@@ -84,7 +84,11 @@ public class ItinerariesView {
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
+        Label comboLabel = new Label("Reserva:");
+        comboLabel.getStyleClass().add("page-subtitle");
+        
         reservationComboBox = new ComboBox<>();
+        reservationComboBox.getStyleClass().add("input-field");
         reservationComboBox.setPromptText("Selecione uma reserva");
         reservationComboBox.setConverter(new StringConverter<>() {
             @Override
@@ -99,16 +103,20 @@ public class ItinerariesView {
         });
         reservationComboBox.valueProperty().addListener((obs, oldVal, newVal) -> loadItinerary(newVal));
 
+        HBox reservationSelector = new HBox(8, comboLabel, reservationComboBox);
+        reservationSelector.setAlignment(Pos.CENTER_LEFT);
+
         Button addActivityButton = new Button("Adicionar Atividade");
         addActivityButton.getStyleClass().add("add-button");
         FontIcon plusIcon = new FontIcon(MaterialDesignP.PLUS);
         plusIcon.setIconSize(ICON_SIZE);
+        plusIcon.setIconColor(javafx.scene.paint.Color.WHITE);
         addActivityButton.setGraphic(plusIcon);
         addActivityButton.setOnAction(e -> {
             showAddActivityDialog();
         });
 
-        header.getChildren().addAll(titleBox, spacer, reservationComboBox, addActivityButton);
+        header.getChildren().addAll(titleBox, spacer, reservationSelector, addActivityButton);
         return header;
     }
 
