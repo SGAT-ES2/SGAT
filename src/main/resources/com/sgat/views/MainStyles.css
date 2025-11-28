@@ -3,7 +3,7 @@
    ========================================================================== */
 
 .root {
-    -fx-font-family: "Inter", sans-serif;
+    -fx-font-family: sans-serif;
     -fx-background-color: #F8F9FA;
     -fx-primary-text-color: #343A40; /* Softer black */
 }
@@ -421,8 +421,8 @@
 
 .table-card {
     -fx-background-color: white;
-    -fx-padding: 0; /* Remove padding from card to let table control it */
-    -fx-spacing: 0;
+    -fx-padding: 16;
+    -fx-spacing: 16;
     -fx-background-radius: 16;
     -fx-border-width: 0;
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 20, 0, 0, 5);
@@ -608,3 +608,65 @@
     -fx-max-width: infinity;
 }
 
+/* ==========================================================================
+   Itineraries View (Rebuilt)
+   ========================================================================== */
+
+.rebuilt-day-container {
+    -fx-background-color: white;
+}
+
+.rebuilt-scroll-pane {
+    -fx-background-color: transparent;
+    -fx-padding: 10 0 0 0; /* Add some padding at the top of the scroll area */
+}
+
+.rebuilt-day-header-label {
+    -fx-font-size: 18px;
+    -fx-font-weight: 700;
+    -fx-text-fill: #343A40;
+}
+
+.rebuilt-day-header-icon {
+    -fx-icon-size: 20px;
+    -fx-fill: #343A40;
+}
+
+.rebuilt-activity-row-border {
+    -fx-border-color: transparent transparent #E9ECEF transparent;
+    -fx-border-width: 1;
+}
+
+.rebuilt-activity-icon-wrapper {
+    -fx-background-color: #E3F2FD;
+    -fx-background-radius: 50;
+    -fx-min-width: 36;
+    -fx-min-height: 36;
+    -fx-alignment: center;
+}
+
+.rebuilt-activity-icon {
+    -fx-icon-size: 18px;
+    -fx-fill: #1E88E5;
+}
+
+.rebuilt-activity-title {
+    -fx-font-size: 16px;
+    -fx-font-weight: 600;
+    -fx-text-fill: #212529;
+}
+
+.rebuilt-activity-time {
+    -fx-font-size: 13px;
+    -fx-text-fill: #6C757D;
+}
+
+.rebuilt-activity-time-icon {
+    -fx-icon-size: 14px;
+    -fx-fill: #6C757D;
+}
+
+.rebuilt-activity-description {
+    -fx-font-size: 14px;
+    -fx-text-fill: #495057;
+}

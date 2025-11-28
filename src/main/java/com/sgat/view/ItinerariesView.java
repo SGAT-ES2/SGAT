@@ -7,6 +7,8 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import org.kordamp.ikonli.javafx.FontIcon;
@@ -40,7 +42,7 @@ public class ItinerariesView {
         VBox.setVgrow(itineraryContainer, Priority.ALWAYS);
 
         view.getChildren().addAll(header, itineraryContainer);
-        
+
         loadReservations();
     }
 
@@ -55,7 +57,7 @@ public class ItinerariesView {
             reservationComboBox.setValue(reservations.get(0));
         }
     }
-    
+
     private void loadItinerary(Reservation reservation) {
         itineraryContainer.getChildren().clear();
         if (reservation != null) {
@@ -72,7 +74,7 @@ public class ItinerariesView {
 
     private Node createHeader() {
         HBox header = new HBox(16);
-        header.setAlignment(Pos.CENTER_LEFT);
+        header.setAlignment(Pos.CENTER);
 
         VBox titleBox = new VBox(-2);
         Label title = new Label("Itinerários");
@@ -86,9 +88,10 @@ public class ItinerariesView {
 
         Label comboLabel = new Label("Reserva:");
         comboLabel.getStyleClass().add("page-subtitle");
-        
+
         reservationComboBox = new ComboBox<>();
         reservationComboBox.getStyleClass().add("input-field");
+        reservationComboBox.setPrefHeight(40);
         reservationComboBox.setPromptText("Selecione uma reserva");
         reservationComboBox.setConverter(new StringConverter<>() {
             @Override
@@ -108,6 +111,7 @@ public class ItinerariesView {
 
         Button addActivityButton = new Button("Adicionar Atividade");
         addActivityButton.getStyleClass().add("add-button");
+        addActivityButton.setPrefHeight(40);
         FontIcon plusIcon = new FontIcon(MaterialDesignP.PLUS);
         plusIcon.setIconSize(ICON_SIZE);
         plusIcon.setIconColor(javafx.scene.paint.Color.WHITE);
@@ -125,22 +129,19 @@ public class ItinerariesView {
         card.getStyleClass().add("table-card");
         VBox.setVgrow(card, Priority.ALWAYS);
 
-        // Card Header
         HBox cardHeader = new HBox(8);
         cardHeader.setAlignment(Pos.CENTER_LEFT);
         FontIcon mapIcon = new FontIcon(MaterialDesignM.MAP_MARKER);
-        mapIcon.setIconSize(ICON_SIZE);
-        
+        mapIcon.getStyleClass().add("info-card-title-icon");
+
         Reservation reservation = itinerary.getReservation();
-        
+
         cardHeader.getChildren().addAll(
                 mapIcon,
                 new Label(String.format("RES-%d - %s - %s", reservation.getId(), reservation.getClient().getName(), reservation.getTravelPackage().getNomePacote()))
         );
         cardHeader.getStyleClass().add("info-card-title");
 
-
-        // Tabs for each day
         TabPane tabPane = new TabPane();
         tabPane.getStyleClass().add("itinerary-tabs");
         for (Day day : itinerary.getDays()) {
@@ -156,75 +157,85 @@ public class ItinerariesView {
     }
 
     private Node createDayContent(Day day) {
-        VBox dayContent = new VBox(20);
-        dayContent.setPadding(new Insets(16));
+        VBox dayContainer = new VBox(10);
+        dayContainer.setPadding(new Insets(20));
+        dayContainer.getStyleClass().add("rebuilt-day-container");
 
-        HBox dayTitleBox = new HBox(8);
-        dayTitleBox.setAlignment(Pos.CENTER_LEFT);
-        FontIcon calendarIcon = new FontIcon(MaterialDesignC.CALENDAR);
-        calendarIcon.setIconSize(ICON_SIZE);
-        dayTitleBox.getChildren().addAll(
-                calendarIcon,
-                new Label(String.format("Dia %d - %s", day.getDayNumber(), day.getTitle()))
-        );
-        dayTitleBox.getStyleClass().add("day-title");
+        // --- HEADER ---
+        HBox dayHeader = new HBox(8);
+        dayHeader.setAlignment(Pos.CENTER_LEFT);
+        FontIcon headerIcon = new FontIcon(MaterialDesignC.CALENDAR);
+        headerIcon.getStyleClass().add("rebuilt-day-header-icon");
+        Label headerLabel = new Label("Dia " + day.getDayNumber());
+        headerLabel.getStyleClass().add("rebuilt-day-header-label");
+        dayHeader.getChildren().addAll(headerIcon, headerLabel);
 
-        VBox timeline = new VBox();
+        // --- SCROLLABLE CONTENT ---
+        VBox activitiesContainer = new VBox(); // Will hold all activity rows
         List<Activity> activities = day.getActivities();
         for (int i = 0; i < activities.size(); i++) {
-            timeline.getChildren().add(createActivityRow(activities.get(i), i == activities.size() - 1));
+            boolean isLast = (i == activities.size() - 1);
+            activitiesContainer.getChildren().add(createActivityRow(activities.get(i), isLast));
         }
 
-        dayContent.getChildren().addAll(dayTitleBox, timeline);
-
-        ScrollPane scrollPane = new ScrollPane(dayContent);
+        ScrollPane scrollPane = new ScrollPane(activitiesContainer);
         scrollPane.setFitToWidth(true);
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-        scrollPane.getStyleClass().add("day-scroll-pane");
+        scrollPane.getStyleClass().add("rebuilt-scroll-pane");
+        VBox.setVgrow(scrollPane, Priority.ALWAYS);
 
-        return scrollPane;
+
+        dayContainer.getChildren().addAll(dayHeader, scrollPane);
+        return dayContainer;
     }
 
     private Node createActivityRow(Activity activity, boolean isLast) {
-        HBox activityRow = new HBox(16);
-
-        VBox iconColumn = new VBox();
-        iconColumn.setAlignment(Pos.TOP_CENTER);
-        iconColumn.setSpacing(8);
-
-        FontIcon activityIcon = new FontIcon(activity.getIcon());
-        activityIcon.setIconSize(ICON_SIZE);
-        StackPane iconContainer = new StackPane(activityIcon);
-        iconContainer.getStyleClass().add("timeline-icon-container");
-        iconContainer.setAlignment(Pos.CENTER);
-
-        iconColumn.getChildren().add(iconContainer);
-
+        // --- Main Row Container ---
+        HBox activityRow = new HBox(15);
+        activityRow.setPadding(new Insets(10, 0, 10, 0));
         if (!isLast) {
-            Region line = new Region();
-            line.getStyleClass().add("timeline-line");
-            VBox.setVgrow(line, Priority.ALWAYS);
-            iconColumn.getChildren().add(line);
+            activityRow.getStyleClass().add("rebuilt-activity-row-border");
         }
 
-        VBox contentColumn = new VBox(4);
+        // --- Icon Column ---
+        VBox iconColumn = new VBox(5);
+        iconColumn.setAlignment(Pos.TOP_CENTER);
 
-        HBox timeBox = new HBox(8);
+        StackPane iconWrapper = new StackPane();
+        iconWrapper.getStyleClass().add("rebuilt-activity-icon-wrapper");
+        FontIcon activityIcon = new FontIcon(MaterialDesignM.MAP_MARKER);
+        activityIcon.getStyleClass().add("rebuilt-activity-icon");
+        iconWrapper.getChildren().add(activityIcon);
+        
+        iconColumn.getChildren().add(iconWrapper);
+
+        // --- Content Column ---
+        VBox contentColumn = new VBox(5);
+        HBox.setHgrow(contentColumn, Priority.ALWAYS);
+
+        // Title and Time
+        HBox titleBar = new HBox(8);
+        titleBar.setAlignment(Pos.CENTER_LEFT);
+        Label titleLabel = new Label(activity.getTitle());
+        titleLabel.getStyleClass().add("rebuilt-activity-title");
+        HBox.setHgrow(titleLabel, Priority.ALWAYS);
+
+        HBox timeBox = new HBox(5);
         timeBox.setAlignment(Pos.CENTER_LEFT);
         FontIcon clockIcon = new FontIcon(MaterialDesignC.CLOCK_OUTLINE);
-        clockIcon.setIconSize(ICON_SIZE);
-        timeBox.getChildren().addAll(clockIcon, new Label(activity.getTime()));
-        timeBox.getStyleClass().add("activity-time");
+        clockIcon.getStyleClass().add("rebuilt-activity-time-icon");
+        Label timeLabel = new Label(activity.getTime());
+        timeLabel.getStyleClass().add("rebuilt-activity-time");
+        timeBox.getChildren().addAll(clockIcon, timeLabel);
 
-        Label titleLabel = new Label(activity.getTitle());
-        titleLabel.getStyleClass().add("activity-title");
+        titleBar.getChildren().addAll(titleLabel, timeBox);
 
+        // Description
         Label descriptionLabel = new Label(activity.getDescription());
         descriptionLabel.setWrapText(true);
-        descriptionLabel.getStyleClass().add("activity-description");
+        descriptionLabel.getStyleClass().add("rebuilt-activity-description");
 
-        contentColumn.getChildren().addAll(timeBox, titleLabel, descriptionLabel);
-        HBox.setHgrow(contentColumn, Priority.ALWAYS);
+        contentColumn.getChildren().addAll(titleBar, descriptionLabel);
 
         activityRow.getChildren().addAll(iconColumn, contentColumn);
         return activityRow;

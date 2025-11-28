@@ -29,11 +29,6 @@ public class PaymentsView {
     private Label receivedValueLabel; 
     private Label pendingValueLabel;  
 
-    private static final double COL_RES_WIDTH = 200; 
-    private static final double COL_VAL_WIDTH = 120; 
-    private static final double COL_MET_WIDTH = 130; 
-    private static final double COL_DAT_WIDTH = 120;
-    private static final double COL_STA_WIDTH = 80;
     private static final double COLUMN_GAP = 12;
     private static final int ICON_SIZE = 20;
 
@@ -230,14 +225,14 @@ public class PaymentsView {
         header.getStyleClass().add("column-header-background"); 
         header.setPadding(new Insets(10, 16, 10, 16));
 
-        Label resLabel = createHeaderLabel("Reserva", COL_RES_WIDTH, Pos.CENTER_LEFT); 
-        Label totalLabel = createHeaderLabel("Valor Total", COL_VAL_WIDTH, Pos.CENTER_RIGHT); 
-        Label pagoLabel = createHeaderLabel("Valor Pago", COL_VAL_WIDTH, Pos.CENTER_RIGHT); 
-        Label pendenteLabel = createHeaderLabel("Pendente", COL_VAL_WIDTH, Pos.CENTER_RIGHT); 
+        Label resLabel = createHeaderLabel("Reserva", Pos.CENTER_LEFT);
+        Label totalLabel = createHeaderLabel("Valor Total", Pos.CENTER_RIGHT);
+        Label pagoLabel = createHeaderLabel("Valor Pago", Pos.CENTER_RIGHT);
+        Label pendenteLabel = createHeaderLabel("Pendente", Pos.CENTER_RIGHT);
         
-        Label metodoLabel = createHeaderLabel("Método", COL_MET_WIDTH, Pos.CENTER_LEFT); 
-        Label dataLabel = createHeaderLabel("Data", COL_DAT_WIDTH, Pos.CENTER_LEFT); 
-        Label statusLabel = createHeaderLabel("Status", COL_STA_WIDTH, Pos.CENTER); 
+        Label metodoLabel = createHeaderLabel("Método", Pos.CENTER_LEFT);
+        Label dataLabel = createHeaderLabel("Data", Pos.CENTER_LEFT);
+        Label statusLabel = createHeaderLabel("Status", Pos.CENTER);
 
         HBox.setHgrow(resLabel, Priority.ALWAYS); 
         HBox.setHgrow(totalLabel, Priority.SOMETIMES);
@@ -252,11 +247,9 @@ public class PaymentsView {
         return header;
     }
     
-    private Label createHeaderLabel(String text, double width, Pos alignment) {
+    private Label createHeaderLabel(String text, Pos alignment) {
         Label label = new Label(text);
         label.getStyleClass().add("column-header"); 
-        label.setMinWidth(width);
-        label.setPrefWidth(width); 
         label.setMaxWidth(Double.MAX_VALUE);
         label.setAlignment(alignment); 
         return label;
@@ -277,17 +270,15 @@ public class PaymentsView {
         lblClient.getStyleClass().add("list-item-package-info");
         resBox.getChildren().addAll(lblRes, lblClient);
         
-        resBox.setMinWidth(COL_RES_WIDTH);
-        resBox.setPrefWidth(COL_RES_WIDTH);
         HBox.setHgrow(resBox, Priority.ALWAYS); 
         resBox.setAlignment(Pos.CENTER_LEFT); 
         
-        Label lblTotal = createAlignedDataLabel(total, "#666666", COL_VAL_WIDTH, Pos.CENTER_RIGHT, Priority.SOMETIMES);
-        Label lblPaid = createAlignedDataLabel(paid, "#388e3c", COL_VAL_WIDTH, Pos.CENTER_RIGHT, Priority.SOMETIMES); 
-        Label lblPending = createAlignedDataLabel(pending, "#ef6c00", COL_VAL_WIDTH, Pos.CENTER_RIGHT, Priority.SOMETIMES); 
+        Label lblTotal = createAlignedDataLabel(total, "#666666", Pos.CENTER_RIGHT, Priority.SOMETIMES);
+        Label lblPaid = createAlignedDataLabel(paid, "#388e3c", Pos.CENTER_RIGHT, Priority.SOMETIMES);
+        Label lblPending = createAlignedDataLabel(pending, "#ef6c00", Pos.CENTER_RIGHT, Priority.SOMETIMES);
         
-        Label lblMethod = createAlignedDataLabel(method, "#424242", COL_MET_WIDTH, Pos.CENTER_LEFT, Priority.SOMETIMES);
-        Label lblDate = createAlignedDataLabel(date, "#666666", COL_DAT_WIDTH, Pos.CENTER_LEFT, Priority.SOMETIMES);
+        Label lblMethod = createAlignedDataLabel(method, "#424242", Pos.CENTER_LEFT, Priority.SOMETIMES);
+        Label lblDate = createAlignedDataLabel(date, "#666666", Pos.CENTER_LEFT, Priority.SOMETIMES);
 
         Label lblStatus = new Label(status);
         lblStatus.getStyleClass().add("status-label");
@@ -300,8 +291,6 @@ public class PaymentsView {
             lblStatus.getStyleClass().add("status-cancelada"); 
         }
         
-        lblStatus.setMinWidth(COL_STA_WIDTH);
-        lblStatus.setPrefWidth(COL_STA_WIDTH);
         HBox.setHgrow(lblStatus, Priority.NEVER);
         lblStatus.setAlignment(Pos.CENTER); 
 
@@ -314,12 +303,10 @@ public class PaymentsView {
         return row;
     }
     
-    private Label createAlignedDataLabel(String text, String colorHex, double width, Pos alignment, Priority growPriority) {
+    private Label createAlignedDataLabel(String text, String colorHex, Pos alignment, Priority growPriority) {
         Label label = new Label(text);
         label.getStyleClass().add("table-cell"); 
         label.setStyle("-fx-text-fill: " + colorHex + ";");
-        label.setMinWidth(width);
-        label.setPrefWidth(width); 
         label.setAlignment(alignment); 
         label.setMaxWidth(Double.MAX_VALUE);
         HBox.setHgrow(label, growPriority); 
