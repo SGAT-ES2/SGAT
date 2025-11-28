@@ -201,7 +201,6 @@ public class PackagesView {
     private void handleEditPackage(Package pkg) {
         showPackageDialog(pkg).ifPresent(editedPackage -> {
             packageDAO.updatePackage(editedPackage);
-            // A UI se atualiza sozinha via bindings.
             showAlert(Alert.AlertType.INFORMATION, "Pacote Atualizado", "O pacote foi atualizado com sucesso.");
         });
     }

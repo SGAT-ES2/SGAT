@@ -534,10 +534,11 @@
 
 .plane-icon-container {
     -fx-background-color: linear-gradient(to bottom right, #2979FF, #448AFF);
-    -fx-background-radius: 10;
+    -fx-background-radius: 100;
     -fx-padding: 15;
     -fx-min-width: 60;
     -fx-min-height: 60;
+    -fx-max-width: 60;
     -fx-alignment: center;
 }
 

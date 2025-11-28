@@ -11,7 +11,6 @@ import java.sql.SQLException;
 import java.util.Objects;
 
 public class Main extends Application {
-    // por enquanto a conexão está hardcoded, favor colocar as suas credenciais
     static final String DB_URL = "jdbc:postgresql://localhost:5432/sgat";
     static final String DB_USER = "postgres";
     static final String DB_PASS = "123";
@@ -20,8 +19,7 @@ public class Main extends Application {
     public void start(Stage primaryStage) {
         primaryStage.setTitle("TravelManager");
 
-        // --- Scene and Stage ---
-        Scene scene = new Scene(new Pane()); // Inicia com uma cena vazia
+        Scene scene = new Scene(new Pane());
         scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/com/sgat/views/MainStyles.css")).toExternalForm());
         primaryStage.setScene(scene);
 
