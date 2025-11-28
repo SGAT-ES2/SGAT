@@ -1,27 +1,30 @@
 package com.sgat.controller;
 
-import com.sgat.model.ReportDAO; // Importamos o novo DAO
+import com.sgat.model.ReportDAO;
 import com.sgat.view.ReportsView;
+
+// --- IMPORTS OBRIGATÓRIOS PARA O PDF FUNCIONAR ---
+import com.sgat.controller.PDFGenerator;
 import com.sgat.controller.PDFGenerator.PdfExportMode;
+// -------------------------------------------------
 
 public class ReportsController {
 
     private final ReportsView view;
-    private final ReportDAO reportDAO; // Variável para o DAO
+    private final ReportDAO reportDAO;
 
     public ReportsController(ReportsView view) {
         this.view = view;
-        this.reportDAO = new ReportDAO(); // Inicializamos o DAO aqui
+        this.reportDAO = new ReportDAO();
 
         view.setController(this);
 
-        // Ao iniciar, carrega dados de 2025 do banco de dados
+        // Carrega dados iniciais
         updateView("2025");
     }
 
-    // Este método agora busca no BANCO, não mais no HashMap falso
     public ReportData getReportData(String year) {
-        System.out.println("Buscando dados reais no banco para o ano: " + year);
+        // Busca do banco de dados
         return reportDAO.getReportDataForYear(year);
     }
 
@@ -35,17 +38,20 @@ public class ReportsController {
     }
 
     public void exportPDF() {
-        String year = view.getSelectedYear();
-
-        // Pega os dados mais recentes do banco
-        ReportData data = getReportData(year);
-        PdfExportMode mode = view.getSelectedExportMode();
-
-        System.out.println("Gerando PDF (" + mode + ") para o ano: " + year);
-
         try {
+            String year = view.getSelectedYear();
+            ReportData data = getReportData(year);
+
+            // Pega o modo selecionado no ComboBox (Texto, Gráfico ou Completo)
+            PdfExportMode mode = view.getSelectedExportMode();
+
+            System.out.println("Gerando PDF (" + mode + ") para o ano: " + year);
+
+            // Chama o gerador
             PDFGenerator.generatePDF(data, mode);
+
             System.out.println("PDF gerado com sucesso!");
+
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println("Erro ao gerar PDF: " + e.getMessage());
