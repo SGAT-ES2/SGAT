@@ -37,7 +37,7 @@ public class PaymentsView {
     public PaymentsView() {
         view = new VBox(24);
         view.setPadding(new Insets(24));
-        view.getStyleClass().add("dashboard-pane");
+        view.getStyleClass().addAll("dashboard-pane", "payments-view");
 
         this.controller = new PaymentsController(this);
 
