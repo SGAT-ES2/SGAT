@@ -1,5 +1,3 @@
-TRUNCATE TABLE pagamento RESTART IDENTITY;
-
 INSERT INTO pagamento (reserva_id, data_pagamento, valor_pago, metodo_pagamento, status, notas) VALUES
 (1, '2026-08-22', 27885.55, 'Cartão de Crédito', 'Concluído', 'Pagamento da parcela 1/1 da reserva 1.'),
 (2, '2026-11-03', 17443.91, 'Boleto Bancário', 'Pendente', 'Pagamento da parcela 1/2 da reserva 2.'),

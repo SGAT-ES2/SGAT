@@ -23,6 +23,7 @@ public class ClientsView {
     private final ClientsController controller;
     private TableView<Client> table;
     private final ObservableList<Client> clients;
+    private static final int ICON_SIZE = 20;
 
     public ClientsView(Stage stage) {
         this.stage = stage;
@@ -65,6 +66,8 @@ public class ClientsView {
         Button newClientButton = new Button("Novo Cliente");
         newClientButton.getStyleClass().add("add-button");
         FontIcon plusIcon = new FontIcon(MaterialDesignP.PLUS);
+        plusIcon.setIconSize(ICON_SIZE);
+        plusIcon.setIconColor(javafx.scene.paint.Color.WHITE);
         newClientButton.setGraphic(plusIcon);
         newClientButton.setOnAction(e -> handleAddClient());
 

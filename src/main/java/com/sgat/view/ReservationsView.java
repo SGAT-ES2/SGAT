@@ -31,6 +31,7 @@ public class ReservationsView {
     private final ReservationsController controller;
     private final ClientDAO clientDAO;
     private final PackageDAO packageDAO;
+    private static final int ICON_SIZE = 20;
 
     public ReservationsView(Stage stage) {
         this.stage = stage;
@@ -76,8 +77,9 @@ public class ReservationsView {
 
         Button newReservationButton = new Button("Nova Reserva");
         newReservationButton.getStyleClass().add("add-button");
-        SVGPath plusIcon = new SVGPath();
-        plusIcon.setContent("M12 5v14m-7-7h14");
+        FontIcon plusIcon = new FontIcon(MaterialDesignP.PLUS);
+        plusIcon.setIconSize(ICON_SIZE);
+        plusIcon.setIconColor(javafx.scene.paint.Color.WHITE);
         newReservationButton.setGraphic(plusIcon);
         newReservationButton.setOnAction(e -> handleAddReservation());
 
