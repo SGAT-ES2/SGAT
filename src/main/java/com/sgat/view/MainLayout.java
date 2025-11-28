@@ -52,6 +52,7 @@ public class MainLayout {
     private final ToggleGroup toggleGroup = new ToggleGroup();
     private final int ICON_SIZE = 20;
     private ItinerariesView itinerariesController;
+    private DashboardView dashboardView;
 
     // ------------- AJUSTE NECESSÁRIO: CONSTRUTOR RECEBE DashboardController --------------
     public MainLayout(Stage stage, ScreenController screenController, DashboardController dashboardController) {
@@ -70,7 +71,8 @@ public class MainLayout {
         views.put("Relatórios", reportsView.getView());
 
         // ------------- AJUSTE: DashboardView agora recebe controller --------------
-        views.put("Dashboard", new DashboardView(dashboardController).getView());
+        this.dashboardView = new DashboardView(dashboardController);
+        views.put("Dashboard", dashboardView.getView());
 
         views.put("Pacotes", new PackagesView(stage).getView());
         views.put("Clientes", new ClientsView(stage).getView());
@@ -280,6 +282,10 @@ public class MainLayout {
             boolean isVisible = entry.getKey().equals(viewName);
             entry.getValue().setVisible(isVisible);
             entry.getValue().setManaged(isVisible);
+        }
+        
+        if ("Dashboard".equals(viewName)) {
+            dashboardView.update();
         }
         if ("Itinerários".equals(viewName)) {
             itinerariesController.loadReservations();

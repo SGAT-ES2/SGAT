@@ -44,13 +44,8 @@ public class DashboardController {
         return rs.getInt(1);
     }
 
-    public double getReceitaDoMes() throws SQLException {
-        String sql = """
-            SELECT SUM(valor_pago)
-            FROM pagamento
-            WHERE DATE_PART('month', data_pagamento) = DATE_PART('month', CURRENT_DATE)
-              AND DATE_PART('year', data_pagamento) = DATE_PART('year', CURRENT_DATE)
-        """;
+    public double getReceitaTotal() throws SQLException {
+        String sql = "SELECT SUM(valor_pago) FROM pagamento";
         PreparedStatement ps = conn.prepareStatement(sql);
         ResultSet rs = ps.executeQuery();
         rs.next();

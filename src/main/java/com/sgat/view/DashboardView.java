@@ -1,6 +1,8 @@
 package com.sgat.view;
 
 import java.util.List;
+import java.text.NumberFormat;
+import java.util.Locale;
 
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.materialdesign2.MaterialDesignA;
@@ -26,14 +28,23 @@ import javafx.scene.layout.VBox;
 public class DashboardView {
 
     private final DashboardController controller;
+    private final VBox view;
 
     public DashboardView(DashboardController controller) {
         this.controller = controller;
+        this.view = new VBox();
+        this.view.getStyleClass().add("dashboard-pane");
     }
 
     public Node getView() {
-        VBox dashboardPane = new VBox();
-        dashboardPane.getStyleClass().add("dashboard-pane");
+        if (view.getChildren().isEmpty()) {
+            update();
+        }
+        return view;
+    }
+
+    public void update() {
+        view.getChildren().clear();
 
         // Título
         Label title = new Label("Dashboard");
@@ -59,12 +70,12 @@ public class DashboardView {
         int totalPacotes = safeInt(() -> controller.getTotalPacotes());
         int totalClientes = safeInt(() -> controller.getTotalClientes());
         int reservasPendentes = safeInt(() -> controller.getReservasPendentes());
-        double receitaMes = safeDouble(() -> controller.getReceitaDoMes());
+        double receitaTotal = safeDouble(() -> controller.getReceitaTotal());
 
         Node statCard1 = createStatCard("Pacotes Ativos", String.valueOf(totalPacotes), "", new FontIcon(MaterialDesignP.PACKAGE_VARIANT_CLOSED));
         Node statCard2 = createStatCard("Clientes Cadastrados", String.valueOf(totalClientes), "", new FontIcon(MaterialDesignA.ACCOUNT_GROUP_OUTLINE));
         Node statCard3 = createStatCard("Reservas Pendentes", String.valueOf(reservasPendentes), "", new FontIcon(MaterialDesignC.CALENDAR_CLOCK));
-        Node statCard4 = createStatCard("Receita (Mês)", "R$ " + receitaMes, "", new FontIcon(MaterialDesignC.CASH));
+        Node statCard4 = createStatCard("Receita Total", formatCurrency(receitaTotal), "", new FontIcon(MaterialDesignC.CASH));
 
         statsGrid.add(statCard1, 0, 0);
         statsGrid.add(statCard2, 1, 0);
@@ -87,8 +98,7 @@ public class DashboardView {
         infoGrid.add(reservationsCard, 0, 0);
         infoGrid.add(popularPackagesCard, 1, 0);
 
-        dashboardPane.getChildren().addAll(title, subtitle, statsGrid, infoGrid);
-        return dashboardPane;
+        view.getChildren().addAll(title, subtitle, statsGrid, infoGrid);
     }
 
     // -------------------------
@@ -242,6 +252,12 @@ public class DashboardView {
 
     private <T> List<T> safeList(SqlListSupplier<T> s) {
         try { return s.get(); } catch (Exception e) { return List.of(); }
+    }
+
+    private String formatCurrency(double value) {
+        Locale localeBR = new Locale("pt", "BR");
+        NumberFormat nf = NumberFormat.getCurrencyInstance(localeBR);
+        return nf.format(value);
     }
 
     interface SqlIntSupplier { int get() throws Exception; }
