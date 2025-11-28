@@ -10,6 +10,17 @@ import java.util.HashMap;
 import java.util.Map;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.materialdesign2.*;
+import org.kordamp.ikonli.materialdesign2.MaterialDesignA;
+import org.kordamp.ikonli.materialdesign2.MaterialDesignC;
+import org.kordamp.ikonli.materialdesign2.MaterialDesignL;
+import org.kordamp.ikonli.materialdesign2.MaterialDesignM;
+import org.kordamp.ikonli.materialdesign2.MaterialDesignP;
+import org.kordamp.ikonli.materialdesign2.MaterialDesignV;
+
+import com.sgat.controller.DashboardController;
+import com.sgat.controller.ReportsController;
+import com.sgat.controller.ScreenController;
+
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
@@ -38,6 +49,8 @@ public class MainLayout {
     private final BorderPane mainLayout;
     private final Stage stage;
     private final ScreenController screenController;
+    private final DashboardController dashboardController;
+
     private final BooleanProperty sidebarCollapsed = new SimpleBooleanProperty(false);
     private VBox sidebar;
     private final StackPane contentStack;
@@ -48,10 +61,14 @@ public class MainLayout {
     // Controladores que precisam ser acessados depois
     private ItinerariesView itinerariesController;
     private ReportsController reportsController;
+    private DashboardView dashboardView;
 
-    public MainLayout(Stage stage, ScreenController screenController) {
+    // ------------- AJUSTE NECESSÁRIO: CONSTRUTOR RECEBE DashboardController --------------
+    public MainLayout(Stage stage, ScreenController screenController, DashboardController dashboardController) {
         this.stage = stage;
         this.screenController = screenController;
+        this.dashboardController = dashboardController;
+
         mainLayout = new BorderPane();
         contentStack = new StackPane();
 
@@ -63,7 +80,10 @@ public class MainLayout {
         this.reportsController = new ReportsController(reportsView); // Guarda a referência!
         views.put("Relatórios", reportsView.getView());
 
-        views.put("Dashboard", new DashboardView().getView());
+        // ------------- AJUSTE: DashboardView agora recebe controller --------------
+        this.dashboardView = new DashboardView(dashboardController);
+        views.put("Dashboard", dashboardView.getView());
+
         views.put("Pacotes", new PackagesView(stage).getView());
         views.put("Clientes", new ClientsView(stage).getView());
         views.put("Reservas", new ReservationsView(stage).getView());
@@ -199,8 +219,10 @@ public class MainLayout {
             entry.getValue().setVisible(isVisible);
             entry.getValue().setManaged(isVisible);
         }
-
-        // Atualizações Específicas
+        
+        if ("Dashboard".equals(viewName)) {
+            dashboardView.update();
+        }
         if ("Itinerários".equals(viewName)) {
             itinerariesController.loadReservations();
         }
