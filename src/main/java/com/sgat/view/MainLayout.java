@@ -191,9 +191,23 @@ public class MainLayout {
     }
 
     private Node createSidebarFooter() {
-        Button logoutButton = new Button("Sair");
+        Button logoutButton = new Button();
         logoutButton.getStyleClass().add("sidebar-logout-button");
         logoutButton.setOnAction(e -> screenController.showLoginScreen());
+
+        FontIcon logoutIcon = new FontIcon(MaterialDesignL.LOGOUT);
+        logoutIcon.setIconSize(ICON_SIZE);
+        logoutIcon.getStyleClass().add("icon-svg");
+        
+        Label logoutLabel = new Label("Sair");
+        logoutLabel.visibleProperty().bind(sidebarCollapsed.not());
+        logoutLabel.managedProperty().bind(sidebarCollapsed.not());
+
+        HBox content = new HBox(12, logoutIcon, logoutLabel);
+        content.setAlignment(Pos.CENTER_LEFT);
+        logoutButton.setGraphic(content);
+        logoutButton.setAlignment(Pos.CENTER_LEFT);
+
         return new VBox(logoutButton);
     }
 

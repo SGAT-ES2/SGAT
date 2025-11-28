@@ -159,23 +159,23 @@
 
 /* Target the label directly for font color */
 .sidebar-logout-button .label {
-    -fx-text-fill: #F5C6CB; /* Lighter red for visibility */
+    -fx-text-fill: #FFFFFF; /* White */
 }
 
 .sidebar-logout-button .icon-svg {
-    -fx-fill: #F5C6CB; /* Lighter red for visibility */
+    -fx-fill: #FFFFFF; /* White */
 }
 
 .sidebar-logout-button:hover {
-    -fx-background-color: rgba(220, 53, 69, 0.15);
+    -fx-background-color: rgba(220, 53, 69, 0.15); /* Keep the red background hint */
 }
 
-.sidebar-logout-button:hover .label { /* And for hover state */
-    -fx-text-fill: #F8D7DA; /* Even lighter red on hover */
+.sidebar-logout-button:hover .label {
+    -fx-text-fill: #DC3545; /* Standard red on hover */
 }
 
 .sidebar-logout-button:hover .icon-svg {
-    -fx-fill: #F8D7DA; /* Even lighter red on hover */
+    -fx-fill: #DC3545; /* Standard red on hover */
 }
 
 
@@ -261,7 +261,6 @@
 .stat-card-value {
     -fx-font-size: 28px;
     -fx-font-weight: 700;
-    -fx-text-fill: -fx-primary-text-color;
 }
 
 .stat-card-description {
@@ -421,7 +420,7 @@
 
 .table-card {
     -fx-background-color: white;
-    -fx-padding: 0; /* Remove padding from card to let table control it */
+    -fx-padding: 20; /* Remove padding from card to let table control it */
     -fx-spacing: 0;
     -fx-background-radius: 16;
     -fx-border-width: 0;
@@ -563,6 +562,7 @@
     -fx-border-radius: 8;
     -fx-border-color: #E0E0E0;
     -fx-background-color: #F8F9FA;
+    -fx-pref-height: 40px;
 }
 
 .input-field:focused {
