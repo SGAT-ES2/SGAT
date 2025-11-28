@@ -216,6 +216,7 @@ public class MainLayout {
         contentArea.setTop(createMainContentHeader());
         ScrollPane scrollPane = new ScrollPane(contentStack);
         scrollPane.getStyleClass().add("content-scroll-pane");
+        scrollPane.setFitToHeight(true);
         contentArea.setCenter(scrollPane);
         return contentArea;
     }

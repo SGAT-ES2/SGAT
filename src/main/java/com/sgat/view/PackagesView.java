@@ -23,7 +23,7 @@ import java.util.Optional;
 public class PackagesView {
     private final Stage stage;
     private final VBox view;
-    private final TilePane packagesGrid;
+    private final GridPane packagesGrid;
     private final ObservableList<Package> packages = FXCollections.observableArrayList();
     private final NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(new Locale("pt", "BR"));
     private final PackageDAO packageDAO = new PackageDAO();
@@ -78,16 +78,33 @@ public class PackagesView {
         return header;
     }
 
-    private TilePane createPackagesGrid() {
-        TilePane grid = new TilePane(16, 16);
-        grid.setPadding(new Insets(8));
+    private GridPane createPackagesGrid() {
+        GridPane grid = new GridPane();
+        grid.setHgap(16);
+        grid.setVgap(16);
+
+        ColumnConstraints col1 = new ColumnConstraints();
+        col1.setPercentWidth(33.33);
+        ColumnConstraints col2 = new ColumnConstraints();
+        col2.setPercentWidth(33.33);
+        ColumnConstraints col3 = new ColumnConstraints();
+        col3.setPercentWidth(33.33);
+        grid.getColumnConstraints().addAll(col1, col2, col3);
+
         return grid;
     }
 
     private void rebuildPackageGrid() {
         packagesGrid.getChildren().clear();
+        int col = 0;
+        int row = 0;
         for (Package pkg : packages) {
-            packagesGrid.getChildren().add(createPackageCard(pkg));
+            packagesGrid.add(createPackageCard(pkg), col, row);
+            col++;
+            if (col == 3) {
+                col = 0;
+                row++;
+            }
         }
     }
 
