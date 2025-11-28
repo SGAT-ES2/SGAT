@@ -1,0 +1,63 @@
+package com.sgat.model;
+
+import com.sgat.controller.ReportData;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.text.NumberFormat;
+import java.util.Locale;
+
+public class ReportDAO {
+
+    public ReportData getReportDataForYear(String year) {
+        String totalReservas = "0";
+        String receitaTotal = "R$ 0,00";
+        String novosClientes = "0";
+
+        int ano = Integer.parseInt(year);
+        NumberFormat nf = NumberFormat.getCurrencyInstance(new Locale("pt", "BR"));
+
+        try (Connection conn = DBConnection.getConnection()) {
+
+            // 1. RESERVAS
+            String sqlReservas = "SELECT COUNT(*) FROM reserva WHERE EXTRACT(YEAR FROM data_reserva) = ?";
+            try (PreparedStatement stmt = conn.prepareStatement(sqlReservas)) {
+                stmt.setInt(1, ano);
+                ResultSet rs = stmt.executeQuery();
+                if (rs.next()) {
+                    totalReservas = String.valueOf(rs.getInt(1));
+                }
+            }
+
+            // 2. RECEITA (O Segredo está aqui)
+            // Usamos SUM(valor_pago) para o banco já entregar o total somado (13.500)
+            String sqlReceita = "SELECT SUM(valor_pago) FROM pagamento WHERE EXTRACT(YEAR FROM data_pagamento) = ?";
+            try (PreparedStatement stmt = conn.prepareStatement(sqlReceita)) {
+                stmt.setInt(1, ano);
+                ResultSet rs = stmt.executeQuery();
+
+                if (rs.next()) {
+                    double valorSoma = rs.getDouble(1); // Pega o 13500 direto do banco
+                    if (valorSoma > 0) {
+                        receitaTotal = nf.format(valorSoma);
+                    }
+                }
+            }
+
+            // 3. CLIENTES
+            String sqlClientes = "SELECT COUNT(DISTINCT cliente_id) FROM reserva WHERE EXTRACT(YEAR FROM data_reserva) = ?";
+            try (PreparedStatement stmt = conn.prepareStatement(sqlClientes)) {
+                stmt.setInt(1, ano);
+                ResultSet rs = stmt.executeQuery();
+                if (rs.next()) {
+                    novosClientes = String.valueOf(rs.getInt(1));
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return new ReportData(year, totalReservas, receitaTotal, novosClientes);
+    }
+}
