@@ -14,6 +14,8 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import org.kordamp.ikonli.javafx.FontIcon;
+import org.kordamp.ikonli.materialdesign2.MaterialDesignP;
 
 import java.text.NumberFormat;
 import java.util.Locale;
@@ -32,7 +34,8 @@ public class PaymentsView {
     private static final double COL_MET_WIDTH = 130; 
     private static final double COL_DAT_WIDTH = 120;
     private static final double COL_STA_WIDTH = 80;
-    private static final double COLUMN_GAP = 12; 
+    private static final double COLUMN_GAP = 12;
+    private static final int ICON_SIZE = 20;
 
     public PaymentsView() {
         view = new VBox(24);
@@ -125,17 +128,12 @@ public class PaymentsView {
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        Button registerButton = new Button("+ Registrar Pagamento");
-
-        registerButton.setStyle(
-            "-fx-background-color: #2196F3;" +
-            "-fx-text-fill: white;" +
-            "-fx-font-weight: bold;" +
-            "-fx-padding: 6px 14px;" +
-            "-fx-background-radius: 6px;" +
-            "-fx-cursor: hand;" +
-            "-fx-font-size: 12px;"
-        );
+        Button registerButton = new Button("Registrar Pagamento");
+        registerButton.getStyleClass().add("add-button");
+        FontIcon plusIcon = new FontIcon(MaterialDesignP.PLUS);
+        plusIcon.setIconSize(ICON_SIZE);
+        plusIcon.setIconColor(javafx.scene.paint.Color.WHITE);
+        registerButton.setGraphic(plusIcon);
         
         registerButton.setOnAction(event -> {
             Stage ownerStage = (Stage) registerButton.getScene().getWindow();

@@ -27,6 +27,7 @@ public class PackagesView {
     private final ObservableList<Package> packages = FXCollections.observableArrayList();
     private final NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(new Locale("pt", "BR"));
     private final PackageDAO packageDAO = new PackageDAO();
+    private static final int ICON_SIZE = 20;
 
     public PackagesView(Stage stage) {
         this.stage = stage;
@@ -68,6 +69,8 @@ public class PackagesView {
         Button newPackageButton = new Button("Novo Pacote");
         newPackageButton.getStyleClass().add("add-button");
         FontIcon plusIcon = new FontIcon(MaterialDesignP.PLUS);
+        plusIcon.setIconSize(ICON_SIZE);
+        plusIcon.setIconColor(javafx.scene.paint.Color.WHITE);
         newPackageButton.setGraphic(plusIcon);
         newPackageButton.setOnAction(e -> handleAddPackage());
 
